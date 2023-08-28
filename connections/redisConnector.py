@@ -6,7 +6,7 @@ from redis import Redis, ConnectionError
 from redis.commands.search.query import Query
 from pydantic import ValidationError
 
-from models.api.addModels import Address, UpdateAddress
+from models.api.addModels import AddAddress, UpdateAddress
 from models.api.searchModels import SearchQuery
 
 class RedisConnector:
@@ -52,11 +52,12 @@ class RedisConnector:
         
     def addRecord(self, data:dict):
         try:
-            newAddress = dict(Address(**data))
+            newAddress = dict(AddAddress(**data))
+            data = dict(newAddress["data"])
             print(newAddress)
             self.conn.json().set(name=f"address:{str(uuid4())}",
                                  path="$",
-                                 obj=newAddress)
+                                 obj=data)
         except ConnectionError as e:
             print("Redis Connection Error:", e)
             exit(1)

@@ -1,8 +1,8 @@
-from typing import Union
+from typing import Union, List
 
 from pydantic import BaseModel, constr
 
-from models.api.addModels import CountryEnum, StateEnum, ProvEnum, Address
+from models.db.addressModels import CountryEnum, StateEnum, ProvEnum, Address
 
 class SearchQuery(BaseModel):
     addressLine1: str
@@ -12,3 +12,9 @@ class SearchQuery(BaseModel):
     postalCode: str
     country: CountryEnum
 
+class SearchResult(BaseModel):
+    key: str
+    data: Address
+
+class SearchResults(BaseModel):
+    results: List[SearchResult]
