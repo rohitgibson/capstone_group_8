@@ -2,7 +2,7 @@ from typing import Union
 
 from pydantic import BaseModel, constr
 
-from models.api.addModels import CountryEnum, StateEnum, ProvEnum
+from models.api.addModels import CountryEnum, StateEnum, ProvEnum, Address
 
 class SearchQuery(BaseModel):
     addressLine1: str
@@ -12,5 +12,3 @@ class SearchQuery(BaseModel):
     postalCode: str
     country: CountryEnum
 
-class SearchResponse(BaseModel):
-    pass

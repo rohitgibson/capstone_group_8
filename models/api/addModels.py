@@ -90,3 +90,7 @@ class Address(BaseModel):
     stateProv: Union[StateEnum, ProvEnum]
     postalCode: str
     country: CountryEnum
+
+class UpdateAddress(BaseModel):
+    key: str    
+    data: Address
