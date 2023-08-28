@@ -37,9 +37,9 @@ class RedisConnector:
                 searchQueryFields = f"""@addressLine1:({searchData["addressLine1"]}) @city:({str(searchData["city"])}) @stateProv:{searchData["stateProv"]} @postalCode:{searchData["postalCode"]} @country:{searchData["country"]}"""              
             searchQueryParams = f""""""
             searchQuery = searchQueryFields + searchQueryParams
-            searchCommand = self.conn.ft(index_name="address_index").search(Query(searchQuery)).docs
-            searchCommand = [{'key':result["id"],"data":json.loads(result["json"])} for result in searchCommand]
-            return searchCommand
+            searchResults = self.conn.ft(index_name="address_index").search(Query(searchQuery)).docs
+            searchResults = [{'key':result["id"],"data":json.loads(result["json"])} for result in searchResults]
+            return searchResults
         except ConnectionError as e:
             print("Attempted to search index. Encountered a Redis error:", e)
             exit(1)
