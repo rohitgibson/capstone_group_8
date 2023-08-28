@@ -2,11 +2,8 @@ from uuid import uuid4
 from time import sleep
 import simplejson as json
 
-# from redis_om import get_redis_connection
-from redis import Redis, ConnectionError, from_url, Connection
-from redis.commands.search.aggregation import AggregateRequest, Asc
+from redis import Redis, ConnectionError
 from redis.commands.search.query import Query
-from redis.lock import Lock
 from pydantic import ValidationError
 
 from models.api.addModels import Address
