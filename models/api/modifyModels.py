@@ -13,3 +13,6 @@ class AddAddress(BaseModel):
 class UpdateAddress(BaseModel):
     key: str    
     data: Address
+
+class DeleteAddress(BaseModel):
+    key: str

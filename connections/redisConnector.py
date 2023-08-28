@@ -6,7 +6,7 @@ from redis import Redis, ConnectionError
 from redis.commands.search.query import Query
 from pydantic import ValidationError
 
-from models.api.addModels import AddAddress, UpdateAddress
+from models.api.modifyModels import AddAddress, UpdateAddress
 from models.api.searchModels import SearchQuery
 
 class RedisConnector:
@@ -91,12 +91,8 @@ class RedisConnector:
 
         print(f"Address updated in Redis for {key}")
 
-    def deleteRecord(self, key:str):
+    def deleteRecord(self, data:dict):
         pass
 
-    def getRecord(self, key:str):
-        pass
 
-    # def connectionDisconnect(self):
-    #     pass
 
