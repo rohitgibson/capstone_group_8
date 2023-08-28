@@ -17,4 +17,4 @@ class SearchResult(BaseModel):
     data: Address
 
 class SearchResults(BaseModel):
-    results: List[SearchResult]
+    recommendedAddresses: List[SearchResult]

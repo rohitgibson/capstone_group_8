@@ -7,7 +7,7 @@ from redis.commands.search.query import Query
 from pydantic import ValidationError
 
 from models.api.modifyModels import AddAddress, UpdateAddress
-from models.api.searchModels import SearchQuery
+from models.api.searchModels import SearchQuery, SearchResult
 
 class RedisConnector:
     def __init__(self):
