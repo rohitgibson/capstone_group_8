@@ -49,9 +49,18 @@ def updateAddress():
 # ENDPOINT - delete address
 @app.route("/api/address/modify/delete", methods=["POST"])
 def deleteAddress():
-    pass
+    # Loads data from request
+    data = request.data
+    # Deletes data in Redis
+    deleteRecordResponseCode = redisConnector.deleteRecord(data=data)
+    # Creates response object
+    response = Response(status=deleteRecordResponseCode)
+    # Returns response object
+    return response
 
-
+if __name__ == "__main__":
+    app.run(host="127.0.0.1", port=5005, debug=True)
+    
 # update_dict = {
 #     "key": "address:fc452f31-cde2-4518-80df-bbce8d34adef",
 #     "data": {

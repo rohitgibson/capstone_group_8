@@ -28,6 +28,7 @@ class RedisConnector:
         except Exception as e:
             print("Attempted to create index. Encountered an error:", e)
 
+
     def addRecord(self, data:dict):
         addRecordResponseCode = 0
 
@@ -58,7 +59,6 @@ class RedisConnector:
         print("Address added to Redis...")
         addRecordResponseCode = 201
         return addRecordResponseCode
-
 
 
     def searchData(self, data:dict):
@@ -145,12 +145,42 @@ class RedisConnector:
             updateRecordResponseCode = 500
             return updateRecordResponseCode
 
+
         print(f"Address updated in Redis for {key}")
         updateRecordResponseCode = 201
         return updateRecordResponseCode
 
     def deleteRecord(self, data:dict):
-        pass
+        deleteRecordResponseCode = 0
+
+        
+        try:
+            deleteAddress = dict(deleteAddress(**data))
+        except ValidationError:
+            deleteRecordResponseCode = 400
+            return deleteRecordResponseCode
+        except Exception: 
+            deleteRecordResponseCode = 500
+            return deleteRecordResponseCode
+
+
+        try:
+            key = deleteAddress["key"]
+            self.conn.json().delete(key=f"{key}",
+                                    path="$")
+        except ConnectionError as e:
+            # print("Redis Connection Error:", e)
+            deleteRecordResponseCode = 500
+            return deleteRecordResponseCode
+        except Exception as e:
+            # print("Error:", e)
+            deleteRecordResponseCode = 500
+            return deleteRecordResponseCode
+
+        
+        print(f"Successfully deleted {key}")
+        deleteRecordResponseCode = 200
+        return deleteRecordResponseCode
 
 
 
