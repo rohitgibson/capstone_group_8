@@ -1,21 +1,28 @@
-from flask import Flask, request, Response, jsonify
+import simplejson as json
+
+from flask import Flask, request, make_response, jsonify
 
 from connections.redisConnector import RedisConnector
+from utils.requestUtils import RequestUtils
 
 app = Flask(__name__)
 
 redisConnector = RedisConnector()
+
+requestUtils = RequestUtils()
 
 
 # ENDPOINT - add address
 @app.route("/api/address/add", methods=["POST"])
 def addAddress():
     # Loads data from request
-    data = request.data
+    processedData = requestUtils.processRequestData(data=request.data)
     # Adds data to Redis db
-    addRecordResponseCode = redisConnector.addRecord(data=data)
+    addRecordResponseCode = redisConnector.addRecord(data=processedData)
     # Creates response object
-    response = Response(status=addRecordResponseCode)
+    response = make_response('Response')
+    # Sets response HTTP status code
+    response.status_code = addRecordResponseCode
     # Returns response object
     return response
 
@@ -24,11 +31,17 @@ def addAddress():
 @app.route("/api/address/search", methods=["GET"])
 def searchAddress():
     # Loads data from request
-    data = request.data
+    processedData = requestUtils.processRequestData(data=request.data)
     # Sends search query to Redis
-    searchDataResponseCode, searchDataResponseData = redisConnector.searchData(data=data)
+    searchDataResponseCode, searchDataResponseData = redisConnector.searchData(data=processedData)
     # Creates response object
-    response = Response(response=jsonify(searchDataResponseData), status=searchDataResponseCode)
+    response = make_response('Response')
+    # Sets response HTTP status code
+    response.status_code = searchDataResponseCode
+    # Sets response data
+    response.data = searchDataResponseData
+    # Sets response data mimetype
+    response.mimetype = "application/json"
     # Returns response object
     return response
 
@@ -37,11 +50,13 @@ def searchAddress():
 @app.route("/api/address/modify/update", methods=["POST"])
 def updateAddress():
     # Loads data from request
-    data = request.data
+    processedData = requestUtils.processRequestData(data=request.data)
     # Updates data in Redis
-    updateRecordResponseCode = redisConnector.updateRecord(data=data)
+    updateRecordResponseCode = redisConnector.updateRecord(data=processedData)
     # Creates response object
-    response = Response(status=updateRecordResponseCode)
+    response = make_response('Response')
+    # Sets response HTTP status code
+    response.status_code = updateRecordResponseCode
     # Returns response object
     return response
 
@@ -50,47 +65,19 @@ def updateAddress():
 @app.route("/api/address/modify/delete", methods=["POST"])
 def deleteAddress():
     # Loads data from request
-    data = request.data
+    processedData = requestUtils.processRequestData(data=request.data)
     # Deletes data in Redis
-    deleteRecordResponseCode = redisConnector.deleteRecord(data=data)
+    deleteRecordResponseCode = redisConnector.deleteRecord(data=processedData)
     # Creates response object
-    response = Response(status=deleteRecordResponseCode)
+    response = make_response('Response')
+    # Set response HTTP status code
+    response.status_code = deleteRecordResponseCode
     # Returns response object
     return response
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5005, debug=True)
     
-# update_dict = {
-#     "key": "address:fc452f31-cde2-4518-80df-bbce8d34adef",
-#     "data": {
-#         "firstName": "John",
-#         "lastName": "Dow",
-#         "addressLine1": "2300 Windy Ridge",
-#         "addressLine2": "",
-#         "city": "Atlanta",
-#         "stateProv": "ID",
-#         "postalCode": "30339",
-#         "country": "US"
-#     }
-# }
-
-# search_dict = {
-#     "addressLine1": "2300 Windy Ridge",
-#     "addressLine2": "",
-#     "city": "Atlanta",
-#     "stateProv": "GA",
-#     "postalCode": "30339",
-#     "country": "US"
-# }
-
-# redisConnector.addData(test_dict)
-# redisConnector.updateRecord(data=update_dict)
-# print("Searching")
-# searchData = redisConnector.searchData(data=search_dict)
-# print(searchData)
-
-
 
 
 

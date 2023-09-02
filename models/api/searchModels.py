@@ -1,6 +1,6 @@
 from typing import Union, List, Optional
 
-from pydantic import BaseModel, constr
+from pydantic import BaseModel, constr, Field
 
 from models.db.addressModels import CountryEnum, StateEnum, ProvEnum, Address
 
@@ -19,4 +19,4 @@ class SearchResult(BaseModel):
 class SearchResults(BaseModel):
     searchQuery: SearchQuery
     addressVerified: bool
-    recommendedAddresses: Optional[List[SearchResult]]
+    recommendedAddresses: Optional[List[SearchResult]] = Field(default=None)

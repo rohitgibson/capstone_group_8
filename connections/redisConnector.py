@@ -6,7 +6,7 @@ from redis import Redis, ConnectionError
 from redis.commands.search.query import Query
 from pydantic import ValidationError
 
-from models.api.modifyModels import AddAddress, UpdateAddress
+from models.api.modifyModels import AddAddress, UpdateAddress, DeleteAddress
 from models.api.searchModels import SearchQuery, SearchResults
 
 class RedisConnector:
@@ -33,7 +33,7 @@ class RedisConnector:
         addRecordResponseCode = 0
 
         try:
-            newAddress = dict(AddAddress(**data))
+            newAddress = AddAddress(**data).model_dump()
         except ValidationError:
             addRecordResponseCode = 400
             return addRecordResponseCode
@@ -67,7 +67,7 @@ class RedisConnector:
 
         # ERROR HANDLING BLOCK -- Checks for structural and logical issues with search query
         try:
-            searchQuery = dict(SearchQuery(**data))
+            searchData = SearchQuery(**data).model_dump()
         except ValidationError:
             searchDataResponseCode = 400
             return searchDataResponseCode, searchDataResponseData
@@ -77,10 +77,10 @@ class RedisConnector:
         
         # ERROR HANDLING BLOCK -- Checks for issues encountered during search query (likely to be Redis problems)
         try:
-            if searchQuery["addressLine2"] != "":
-                searchQueryFields = f"""@addressLine1:({searchQuery["addressLine1"]}) @addressLine2:{searchQuery["addressLine2"]} @city:({str(searchQuery["city"])}) @stateProv:{searchQuery["stateProv"]} @postalCode:{searchQuery["postalCode"]} @country:{searchQuery["country"]}"""
+            if searchData["addressLine2"] != "":
+                searchQueryFields = f"""@addressLine1:({searchData["addressLine1"]}) @addressLine2:{searchData["addressLine2"]} @city:({str(searchData["city"])}) @stateProv:{searchData["stateProv"]} @postalCode:{searchData["postalCode"]} @country:{searchData["country"]}"""
             else:
-                searchQueryFields = f"""@addressLine1:({searchQuery["addressLine1"]}) @city:({str(searchQuery["city"])}) @stateProv:{searchQuery["stateProv"]} @postalCode:{searchQuery["postalCode"]} @country:{searchQuery["country"]}"""              
+                searchQueryFields = f"""@addressLine1:({searchData["addressLine1"]}) @city:({str(searchData["city"])}) @stateProv:{searchData["stateProv"]} @postalCode:{searchData["postalCode"]} @country:{searchData["country"]}"""              
             searchQueryParams = f""""""
             searchQuery = searchQueryFields + searchQueryParams
             searchResults = self.conn.ft(index_name="address_index").search(Query(searchQuery)).docs
@@ -94,22 +94,24 @@ class RedisConnector:
             searchDataResponseCode = 500
             return searchDataResponseCode, searchDataResponseData
 
+        print(searchResults)
+        # IF SEARCH EXECUTES WITHOUT ERROR -- Check for search results
         if searchResults != []:
             addressVerified = True
             searchDataResponseData = {
-                "searchQuery": searchQuery,
+                "searchQuery": searchData,
                 "addressVerified": addressVerified,
                 "recommendedAddresses": searchResults
             }   
         else:
             addressVerified = False
             searchDataResponseData = {
-                "searchQuery": searchQuery,
+                "searchQuery": searchData,
                 "addressVerified": addressVerified
             }
 
         searchDataResponseCode = 200
-        searchDataResponseData = dict(SearchResults(**searchDataResponseData))
+        searchDataResponseData = SearchResults(**searchDataResponseData).model_dump_json()
 
         return searchDataResponseCode, searchDataResponseData
     
@@ -120,7 +122,7 @@ class RedisConnector:
 
 
         try:
-            updateAddress = dict(UpdateAddress(**data))
+            updateAddress = UpdateAddress(**data).model_dump()
         except ValidationError:
             updateRecordResponseCode = 400
             return updateRecordResponseCode
@@ -155,7 +157,7 @@ class RedisConnector:
 
         
         try:
-            deleteAddress = dict(deleteAddress(**data))
+            deleteAddress = DeleteAddress(**data).model_dump()
         except ValidationError:
             deleteRecordResponseCode = 400
             return deleteRecordResponseCode
