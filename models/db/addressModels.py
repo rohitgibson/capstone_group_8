@@ -82,11 +82,11 @@ class StateEnum(str, Enum):
     WY = "WY"
 
 class Address(BaseModel):
-    firstName: str
-    lastName: str 
-    addressLine1: str
-    addressLine2: str 
-    city: str 
-    stateProv: Union[StateEnum, ProvEnum]
-    postalCode: str
+    firstName: str = Field(constr(strip_whitespace=True))
+    lastName: str = Field(constr(strip_whitespace=True))
+    addressLine1: str = Field(constr(strip_whitespace=True))
+    addressLine2: str = Field(constr(strip_whitespace=True))
+    city: str = Field(constr(strip_whitespace=True))
+    stateProv: Union[StateEnum, ProvEnum] = Field(constr(strip_whitespace=True, to_upper=True))
+    postalCode: str = Field(constr(strip_whitespace=True, to_upper=True))
     country: CountryEnum

@@ -13,4 +13,5 @@ class RequestUtils:
 
         return processedData
 
-        
+    def adjustCapitalization(self, processedData:dict):
+        pass

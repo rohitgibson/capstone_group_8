@@ -94,7 +94,6 @@ class RedisConnector:
             searchDataResponseCode = 500
             return searchDataResponseCode, searchDataResponseData
 
-        print(searchResults)
         # IF SEARCH EXECUTES WITHOUT ERROR -- Check for search results
         if searchResults != []:
             addressVerified = True

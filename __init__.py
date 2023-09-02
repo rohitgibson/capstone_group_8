@@ -1,5 +1,4 @@
 import simplejson as json
-
 from flask import Flask, request, make_response, jsonify
 
 from connections.redisConnector import RedisConnector
