@@ -29,16 +29,16 @@ class RedisConnector:
             print("Attempted to create index. Encountered an error:", e)
 
     def addRecord(self, data:dict):
-        addAddressResponseCode = 0
+        addRecordResponseCode = 0
 
         try:
             newAddress = dict(AddAddress(**data))
         except ValidationError:
-            addAddressResponseCode = 400
-            return addAddressResponseCode
+            addRecordResponseCode = 400
+            return addRecordResponseCode
         except Exception as e:
-            addAddressResponseCode = 500
-            return addAddressResponseCode
+            addRecordResponseCode = 500
+            return addRecordResponseCode
         
         try:
             data = dict(newAddress["data"])
@@ -47,17 +47,19 @@ class RedisConnector:
                                  path="$",
                                  obj=data)    
         except ConnectionError as e:
-            print("Redis Connection Error:", e)
-            addAddressResponseCode = 500
-            return addAddressResponseCode
+            # print("Redis Connection Error:", e)
+            addRecordResponseCode = 500
+            return addRecordResponseCode
         except Exception as e:
-            print("Error:", e)
-            addAddressResponseCode = 500
-            return addAddressResponseCode
+            # print("Error:", e)
+            addRecordResponseCode = 500
+            return addRecordResponseCode
 
         print("Address added to Redis...")
-        addAddressResponseCode = 201
-        return addAddressResponseCode
+        addRecordResponseCode = 201
+        return addRecordResponseCode
+
+
 
     def searchData(self, data:dict):
         searchDataResponseCode = 0
@@ -110,10 +112,24 @@ class RedisConnector:
         searchDataResponseData = dict(SearchResults(**searchDataResponseData))
 
         return searchDataResponseCode, searchDataResponseData
-         
+    
+
+    # UPDATE RECORD  
     def updateRecord(self, data:dict):
+        updateRecordResponseCode = 0
+
+
         try:
             updateAddress = dict(UpdateAddress(**data))
+        except ValidationError:
+            updateRecordResponseCode = 400
+            return updateRecordResponseCode
+        except Exception: 
+            updateRecordResponseCode = 500
+            return updateRecordResponseCode
+
+
+        try:
             key = updateAddress["key"]
             data = dict(updateAddress["data"])
             print(data)
@@ -121,16 +137,17 @@ class RedisConnector:
                                  path="$",
                                  obj=data)
         except ConnectionError as e:
-            print("Redis Connection Error:", e)
-            exit(1)
-        except ValidationError as e:
-            print("Pydantic Validation Error:", e)
-            exit(1)
+            # print("Redis Connection Error:", e)
+            updateRecordResponseCode = 500
+            return updateRecordResponseCode
         except Exception as e:
-            print("Error:", e)
-            exit(1)
+            # print("Error:", e)
+            updateRecordResponseCode = 500
+            return updateRecordResponseCode
 
         print(f"Address updated in Redis for {key}")
+        updateRecordResponseCode = 201
+        return updateRecordResponseCode
 
     def deleteRecord(self, data:dict):
         pass

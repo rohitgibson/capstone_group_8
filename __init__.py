@@ -2,11 +2,10 @@ from flask import Flask, request, Response, jsonify
 
 from connections.redisConnector import RedisConnector
 
-
-
 app = Flask(__name__)
 
 redisConnector = RedisConnector()
+
 
 # ENDPOINT - add address
 @app.route("/api/address/add", methods=["POST"])
@@ -14,9 +13,9 @@ def addAddress():
     # Loads data from request
     data = request.data
     # Adds data to Redis db
-    addAddressResponseCode = redisConnector.addRecord(data=data)
+    addRecordResponseCode = redisConnector.addRecord(data=data)
     # Creates response object
-    response = Response(status=addAddressResponseCode)
+    response = Response(status=addRecordResponseCode)
     # Returns response object
     return response
 
@@ -37,7 +36,14 @@ def searchAddress():
 # ENDPOINT - update address
 @app.route("/api/address/modify/update", methods=["POST"])
 def updateAddress():
-    pass
+    # Loads data from request
+    data = request.data
+    # Updates data in Redis
+    updateRecordResponseCode = redisConnector.updateRecord(data=data)
+    # Creates response object
+    response = Response(status=updateRecordResponseCode)
+    # Returns response object
+    return response
 
 
 # ENDPOINT - delete address
