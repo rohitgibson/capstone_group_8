@@ -1,4 +1,4 @@
-from typing import Union, List
+from typing import Union, List, Optional
 
 from pydantic import BaseModel, constr
 
@@ -17,4 +17,6 @@ class SearchResult(BaseModel):
     data: Address
 
 class SearchResults(BaseModel):
-    recommendedAddresses: List[SearchResult]
+    searchQuery: SearchQuery
+    addressVerified: bool
+    recommendedAddresses: Optional[List[SearchResult]]
