@@ -10,12 +10,17 @@ class MakeFuzzy:
         return fuzzy_query_text
 
     def splitQueryText(self, query_text:str) -> list:
+        if '-' in query_text:
+            query_text = query_text.replace("-", r" ")
+        else:
+            pass
+
         query_text_list = query_text.split()
 
         return query_text_list
 
     def addFuzzies(self, query_text_list:list) -> list:
-        fuzzyLambda = lambda word: f"%{word}%"
+        fuzzyLambda = lambda word: rf"%{word}%"
         fuzzy_query_text_list = list(map(fuzzyLambda, query_text_list))
 
         return fuzzy_query_text_list

@@ -82,14 +82,16 @@ class RedisConnector:
         # ERROR HANDLING BLOCK -- Checks for issues encountered during search query (likely to be Redis problems)
         try:
             if searchData["addressLine2"] != "":
-                searchQueryFields = f"""@addressLine1:({searchData["addressLine1"]}) @addressLine2:{searchData["addressLine2"]} @city:({str(searchData["city"])}) @stateProv:{searchData["stateProv"]} @postalCode:{searchData["postalCode"]} @country:{searchData["country"]}"""
+                searchQuery = f"""@addressLine1:({searchData["addressLine1"]}) @addressLine2:{searchData["addressLine2"]} @city:({str(searchData["city"])}) @stateProv:{searchData["stateProv"]} @postalCode:{searchData["postalCode"]} @country:{searchData["country"]}"""
             else:
                 print(self.makeFuzzy.execute(query_text=searchData["postalCode"]))
-                searchQueryFields = rf"""@addressLine1:({searchData["addressLine1"]}) @city:({str(searchData["city"])}) @stateProv:({searchData["stateProv"]}) @postalCode:({self.makeFuzzy.execute(query_text=searchData["postalCode"])}) @country:{searchData["country"]}"""              
-            searchQueryParams = f""""""
-            searchQuery = searchQueryFields + searchQueryParams
-            searchResults = self.conn.ft(index_name="address_index").search(Query(searchQuery)).docs
+                searchQuery = rf"""@addressLine1:"{searchData["addressLine1"]}" @city:({str(searchData["city"])}) @stateProv:({searchData["stateProv"]}) @postalCode:{self.makeFuzzy.execute(query_text=searchData["postalCode"])} @country:{searchData["country"]}"""
+                print(searchQuery)              
+            searchQueryParams:dict = {"RETURN ":"1"}
+            searchResults = self.conn.ft(index_name="address_index").search(Query(searchQuery), query_params=searchQueryParams).docs
+            print(searchResults)
             searchResults = [{'key':result["id"],"data":json.loads(result["json"])} for result in searchResults]
+            print(searchResults)
         except ConnectionError as e:
             print("Attempted to search index. Encountered a Redis error:", e)
             searchDataResponseCode = 500
