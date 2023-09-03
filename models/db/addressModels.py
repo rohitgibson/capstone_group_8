@@ -3,7 +3,7 @@ from enum import Enum
 from uuid import uuid4
 
 # from redis_om import HashModel, VectorFieldOptions, Field
-from pydantic import BaseModel, ValidationError, field_validator, constr, Field
+from pydantic import BaseModel, ValidationError, model_validator, field_validator, constr, Field
 
 class CountryEnum(str, Enum):
     US = "US"
@@ -90,3 +90,14 @@ class Address(BaseModel):
     stateProv: Union[StateEnum, ProvEnum] = Field(constr(strip_whitespace=True, to_upper=True))
     postalCode: str = Field(constr(strip_whitespace=True, to_upper=True))
     country: CountryEnum
+
+    # Checks that stateProv enum is compatible with country enum 
+    @model_validator(mode='after')
+    def check_stateProv_valid(self) -> 'Address':
+        stateProv = self.stateProv
+        country = self.country
+
+        if country == "US" and type(stateProv) == StateEnum or country == "CA" and type(stateProv) == ProvEnum:
+            return self
+        else:
+            raise ValueError(f'stateProv value "{stateProv}" incompatible with country value "{country}"')

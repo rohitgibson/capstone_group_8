@@ -1,6 +1,6 @@
 from typing import Union, List, Optional
 
-from pydantic import BaseModel, constr, Field
+from pydantic import BaseModel, constr, Field, ValidationError, model_validator
 
 from models.db.addressModels import CountryEnum, StateEnum, ProvEnum, Address
 

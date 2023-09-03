@@ -6,6 +6,8 @@ from redis import Redis, ConnectionError
 from redis.commands.search.query import Query
 from pydantic import ValidationError
 
+from utils.makeFuzzy import MakeFuzzy
+
 from models.api.modifyModels import AddAddress, UpdateAddress, DeleteAddress
 from models.api.searchModels import SearchQuery, SearchResults
 
@@ -14,6 +16,7 @@ class RedisConnector:
         print("REDIS CONNECTOR INIT")
         self.conn = Redis(decode_responses=True)
         self.createIndex()
+        self.makeFuzzy = MakeFuzzy()
         print("REDIS CONNECTOR STARTED")
     
     def createIndex(self):
@@ -25,16 +28,17 @@ class RedisConnector:
         """
         try:
             self.conn.execute_command(create_index_command)
+            print("Created a new Redis index...")
         except Exception as e:
             print("Attempted to create index. Encountered an error:", e)
-
 
     def addRecord(self, data:dict):
         addRecordResponseCode = 0
 
         try:
             newAddress = AddAddress(**data).model_dump()
-        except ValidationError:
+        except ValidationError as e:
+            print(e)
             addRecordResponseCode = 400
             return addRecordResponseCode
         except Exception as e:
@@ -80,17 +84,18 @@ class RedisConnector:
             if searchData["addressLine2"] != "":
                 searchQueryFields = f"""@addressLine1:({searchData["addressLine1"]}) @addressLine2:{searchData["addressLine2"]} @city:({str(searchData["city"])}) @stateProv:{searchData["stateProv"]} @postalCode:{searchData["postalCode"]} @country:{searchData["country"]}"""
             else:
-                searchQueryFields = f"""@addressLine1:({searchData["addressLine1"]}) @city:({str(searchData["city"])}) @stateProv:{searchData["stateProv"]} @postalCode:{searchData["postalCode"]} @country:{searchData["country"]}"""              
+                print(self.makeFuzzy.execute(query_text=searchData["postalCode"]))
+                searchQueryFields = rf"""@addressLine1:({searchData["addressLine1"]}) @city:({str(searchData["city"])}) @stateProv:({searchData["stateProv"]}) @postalCode:({self.makeFuzzy.execute(query_text=searchData["postalCode"])}) @country:{searchData["country"]}"""              
             searchQueryParams = f""""""
             searchQuery = searchQueryFields + searchQueryParams
             searchResults = self.conn.ft(index_name="address_index").search(Query(searchQuery)).docs
             searchResults = [{'key':result["id"],"data":json.loads(result["json"])} for result in searchResults]
         except ConnectionError as e:
-            # print("Attempted to search index. Encountered a Redis error:", e)
+            print("Attempted to search index. Encountered a Redis error:", e)
             searchDataResponseCode = 500
             return searchDataResponseCode, searchDataResponseData
         except Exception as e:
-            # print("Attempted to search index. Encountered an error:", e)
+            print("Attempted to search index. Encountered an error:", e)
             searchDataResponseCode = 500
             return searchDataResponseCode, searchDataResponseData
 
