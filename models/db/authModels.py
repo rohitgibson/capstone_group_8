@@ -1,6 +1,7 @@
 from typing import Optional, Union, Annotated
 
-from pydantic import BaseModel
+from pydantic import BaseModel, SecretStr
 
 class User(BaseModel):
-    pass 
+    username: str
+    password: SecretStr

@@ -20,7 +20,7 @@ class MakeFuzzy:
         return query_text_list
 
     def addFuzzies(self, query_text_list:list) -> list:
-        fuzzyLambda = lambda word: rf"%{word}%"
+        fuzzyLambda = lambda word: rf"%%{word}%%"
         fuzzy_query_text_list = list(map(fuzzyLambda, query_text_list))
 
         return fuzzy_query_text_list
