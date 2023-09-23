@@ -1,16 +1,18 @@
 from typing import Union, List, Optional
 
-from pydantic import BaseModel, constr, Field, ValidationError, model_validator
+from pydantic import BaseModel, constr, Field, ValidationError, model_validator, ConfigDict
 
 from models.db.addressModels import CountryEnum, StateEnum, ProvEnum, Address
 
 class SearchQuery(BaseModel):
-    addressLine1: str = Field(constr(strip_whitespace=True))
-    addressLine2: str = Field(constr(strip_whitespace=True))
-    city: str = Field(constr(strip_whitespace=True))
-    stateProv: Union[StateEnum, ProvEnum] = Field(constr(strip_whitespace=True, to_upper=True))
-    postalCode: str = Field(constr(strip_whitespace=True, to_upper=True))
-    country: CountryEnum = Field(constr(strip_whitespace=True))
+    model_config = ConfigDict(str_to_upper=True, str_strip_whitespace=True)
+
+    addressLine1: str
+    addressLine2: str
+    city: str 
+    stateProv: Union[StateEnum, ProvEnum] 
+    postalCode: str 
+    country: CountryEnum 
 
 class SearchResult(BaseModel):
     key: str

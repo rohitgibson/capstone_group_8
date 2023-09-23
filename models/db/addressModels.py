@@ -1,9 +1,10 @@
 from typing import Optional, Union, Any
+from typing_extensions import Annotated
 from enum import Enum
 from uuid import uuid4
 
 # from redis_om import HashModel, VectorFieldOptions, Field
-from pydantic import BaseModel, ValidationError, model_validator, field_validator, constr, Field
+from pydantic import BaseModel, ValidationError, model_validator, field_validator, constr, Field, InstanceOf, ConfigDict
 
 class CountryEnum(str, Enum):
     US = "US"
@@ -82,22 +83,31 @@ class StateEnum(str, Enum):
     WY = "WY"
 
 class Address(BaseModel):
-    firstName: str = Field(constr(strip_whitespace=True))
-    lastName: str = Field(constr(strip_whitespace=True))
-    addressLine1: str = Field(constr(strip_whitespace=True))
-    addressLine2: str = Field(constr(strip_whitespace=True))
-    city: str = Field(constr(strip_whitespace=True))
-    stateProv: Union[StateEnum, ProvEnum] = Field(constr(strip_whitespace=True, to_upper=True))
-    postalCode: str = Field(constr(strip_whitespace=True, to_upper=True))
-    country: CountryEnum
+    model_config = ConfigDict(str_to_upper=True, str_strip_whitespace=True)
+
+    firstName: str
+    lastName: str 
+    addressLine1: str
+    addressLine2: str 
+    city: str 
+    stateProv: Union[StateEnum, ProvEnum] 
+    postalCode: str 
+    country: CountryEnum 
 
     # Checks that stateProv enum is compatible with country enum 
     @model_validator(mode='after')
     def check_stateProv_valid(self) -> 'Address':
         stateProv = self.stateProv
         country = self.country
+        postalCode = self.postalCode
 
         if country == "US" and type(stateProv) == StateEnum or country == "CA" and type(stateProv) == ProvEnum:
             return self
+            # if country == "US" and postalCode is InstanceOf[UsPostalCode] or country == "CA" and postalCode is InstanceOf[CaPostalCode]:
+            #     return self
+            # else:
+            #     print(type(postalCode))
+            #     print(postalCode is InstanceOf[UsPostalCode])
+            #     raise ValueError(f'postalCode value "{postalCode}" incompatible with country value "{country}"')
         else:
             raise ValueError(f'stateProv value "{stateProv}" incompatible with country value "{country}"')

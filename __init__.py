@@ -1,15 +1,32 @@
 import simplejson as json
 from flask import Flask, request, make_response, jsonify
+from flask_httpauth import HTTPBasicAuth
+from werkzeug.security import check_password_hash
 
-from connections.redisConnector import RedisConnector
+from db.redisConnector import RedisConnector
+# from auth.authContext import AuthContext
 from utils.requestUtils import RequestUtils
 
 app = Flask(__name__)
+
+# auth = HTTPBasicAuth()
+# authContext = AuthContext()
 
 redisConnector = RedisConnector()
 
 requestUtils = RequestUtils()
 
+# @auth.verify_password
+# def verifyPassword(username, password):
+#     user = authContext.verifyUserCredentials(username=username, password=password)
+    
+#     return user
+
+# @auth.get_user_roles
+# def getUserRoles(username):
+#     role = authContext.verifyUserRole(username=username)
+    
+#     return role
 
 # ENDPOINT - add address
 @app.route("/api/address/add", methods=["POST"])
