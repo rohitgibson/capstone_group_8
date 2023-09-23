@@ -28,6 +28,7 @@ requestUtils = RequestUtils()
     
 #     return role
 
+
 # ENDPOINT - add address
 @app.route("/api/address/add", methods=["POST"])
 def addAddress():
