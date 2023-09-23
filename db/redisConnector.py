@@ -32,6 +32,24 @@ class RedisConnector:
         except Exception as e:
             print("Attempted to create index. Encountered an error:", e)
 
+
+    def checkKeyExists(self, key:str) -> bool:
+        key_temp = key.split(sep=":")[1]
+        print(key_temp)
+
+        try:
+            key_check = self.conn.json().get(key)
+            print(key_check)
+        except Exception as e:
+            print("Redis key check exception:", e)
+            return False
+        
+        if key_check is not None:
+            return True
+        else:
+            return False
+
+
     def addRecord(self, data:dict):
         addRecordResponseCode = 0
 
@@ -66,18 +84,15 @@ class RedisConnector:
 
 
     def searchData(self, data:dict):
-        searchDataResponseCode = 0
         searchDataResponseData = {}
 
         # ERROR HANDLING BLOCK -- Checks for structural and logical issues with search query
         try:
             searchData = SearchQuery(**data).model_dump()
         except ValidationError:
-            searchDataResponseCode = 400
-            return searchDataResponseCode, searchDataResponseData
+            return 400, searchDataResponseData
         except Exception as e:
-            searchDataResponseCode = 500
-            return searchDataResponseCode, searchDataResponseData
+            return 500, searchDataResponseData
         
         # ERROR HANDLING BLOCK -- Checks for issues encountered during search query (likely to be Redis problems)
         try:
@@ -94,12 +109,10 @@ class RedisConnector:
             print(searchResults)
         except ConnectionError as e:
             print("Attempted to search index. Encountered a Redis error:", e)
-            searchDataResponseCode = 500
-            return searchDataResponseCode, searchDataResponseData
+            return 500, searchDataResponseData
         except Exception as e:
             print("Attempted to search index. Encountered an error:", e)
-            searchDataResponseCode = 500
-            return searchDataResponseCode, searchDataResponseData
+            return 500, searchDataResponseData
 
         # IF SEARCH EXECUTES WITHOUT ERROR -- Check for search results
         if searchResults != []:
@@ -116,29 +129,31 @@ class RedisConnector:
                 "addressVerified": addressVerified
             }
 
-        searchDataResponseCode = 200
         searchDataResponseData = SearchResults(**searchDataResponseData).model_dump_json()
 
-        return searchDataResponseCode, searchDataResponseData
+        return 200, searchDataResponseData
     
 
     # UPDATE RECORD  
     def updateRecord(self, data:dict):
-        updateRecordResponseCode = 0
-
-
+        # Performs model validation check on inbound data
         try:
             updateAddress = UpdateAddress(**data).model_dump()
         except ValidationError:
-            updateRecordResponseCode = 400
-            return updateRecordResponseCode
+            return 400
         except Exception: 
-            updateRecordResponseCode = 500
-            return updateRecordResponseCode
+            return 500
+        
+        # Performs check on db to verify key exists 
+        key = updateAddress["key"]
+        key_exists:bool = self.checkKeyExists(key=key)
+        if key_exists is False:
+            return 404
+        else:
+            pass
 
-
+        # Key update logic
         try:
-            key = updateAddress["key"]
             data = dict(updateAddress["data"])
             print(data)
             self.conn.json().set(name=f"{key}",
@@ -146,31 +161,30 @@ class RedisConnector:
                                  obj=data)
         except ConnectionError as e:
             # print("Redis Connection Error:", e)
-            updateRecordResponseCode = 500
-            return updateRecordResponseCode
+            return 500
         except Exception as e:
             # print("Error:", e)
-            updateRecordResponseCode = 500
-            return updateRecordResponseCode
-
+            return 500
 
         print(f"Address updated in Redis for {key}")
-        updateRecordResponseCode = 201
-        return updateRecordResponseCode
+        return 201
 
     def deleteRecord(self, data:dict):
-        deleteRecordResponseCode = 0
 
-        
         try:
             deleteAddress = DeleteAddress(**data).model_dump()
         except ValidationError:
-            deleteRecordResponseCode = 400
-            return deleteRecordResponseCode
+            return 400
         except Exception: 
-            deleteRecordResponseCode = 500
-            return deleteRecordResponseCode
+            return 500
 
+        # Performs check on db to verify key exists 
+        key = deleteAddress["key"]
+        key_exists:bool = self.checkKeyExists(key=key)
+        if key_exists is False:
+            return 404
+        else:
+            pass
 
         try:
             key = deleteAddress["key"]
@@ -178,17 +192,14 @@ class RedisConnector:
                                     path="$")
         except ConnectionError as e:
             # print("Redis Connection Error:", e)
-            deleteRecordResponseCode = 500
-            return deleteRecordResponseCode
+            return 500
         except Exception as e:
             # print("Error:", e)
-            deleteRecordResponseCode = 500
-            return deleteRecordResponseCode
+            return 500
 
         
         print(f"Successfully deleted {key}")
-        deleteRecordResponseCode = 200
-        return deleteRecordResponseCode
+        return 200
 
 
 
