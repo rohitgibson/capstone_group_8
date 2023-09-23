@@ -34,8 +34,6 @@ class RedisConnector:
 
 
     def checkKeyExists(self, key:str) -> bool:
-        key_temp = key.split(sep=":")[1]
-        print(key_temp)
 
         try:
             key_check = self.conn.json().get(key)
