@@ -35,9 +35,16 @@ def addAddress():
     # Loads data from request
     processedData = requestUtils.processRequestData(data=request.data)
     # Adds data to Redis db
-    addRecordResponseCode = redisConnector.addRecord(data=processedData)
+    addRecordResponseCode, addRecordResponseMsg = redisConnector.addRecord(data=processedData)
     # Creates response object
     response = make_response('Response')
+    # Sets response data
+    response.data = requestUtils.processResponse(requestType="add",
+                                                 requestData=processedData,
+                                                 responseCode=addRecordResponseCode,
+                                                 responseMsg=addRecordResponseMsg)
+    # Sets response data mimetype
+    response.mimetype = "application/json"
     # Sets response HTTP status code
     response.status_code = addRecordResponseCode
     # Returns response object
@@ -50,13 +57,16 @@ def searchAddress():
     # Loads data from request
     processedData = requestUtils.processRequestData(data=request.data)
     # Sends search query to Redis
-    searchDataResponseCode, searchDataResponseData = redisConnector.searchData(data=processedData)
+    searchDataResponseCode, searchDataResponseData, searchRequestMsg = redisConnector.searchData(data=processedData)
     # Creates response object
     response = make_response('Response')
     # Sets response HTTP status code
     response.status_code = searchDataResponseCode
     # Sets response data
-    response.data = searchDataResponseData
+    response.data = requestUtils.processResponse(requestType="search",
+                                                 requestData=searchDataResponseData,
+                                                 responseCode=searchDataResponseCode,
+                                                 responseMsg=searchRequestMsg)
     # Sets response data mimetype
     response.mimetype = "application/json"
     # Returns response object
@@ -69,11 +79,19 @@ def updateAddress():
     # Loads data from request
     processedData = requestUtils.processRequestData(data=request.data)
     # Updates data in Redis
-    updateRecordResponseCode = redisConnector.updateRecord(data=processedData)
+    updateRecordResponseCode, updateRecordResponseMsg = redisConnector.updateRecord(data=processedData)
     # Creates response object
     response = make_response('Response')
+    # Sets response data
+    response.data = requestUtils.processResponse(requestType="update",
+                                                 requestData=processedData,
+                                                 responseCode=updateRecordResponseCode,
+                                                 responseMsg=updateRecordResponseMsg)
+    # Sets response data mimetype
+    response.mimetype = "application/json"
     # Sets response HTTP status code
     response.status_code = updateRecordResponseCode
+
     # Returns response object
     return response
 
@@ -84,9 +102,16 @@ def deleteAddress():
     # Loads data from request
     processedData = requestUtils.processRequestData(data=request.data)
     # Deletes data in Redis
-    deleteRecordResponseCode = redisConnector.deleteRecord(data=processedData)
+    deleteRecordResponseCode, deleteRecordResponseMsg = redisConnector.deleteRecord(data=processedData)
     # Creates response object
     response = make_response('Response')
+    # Sets response data
+    response.data = requestUtils.processResponse(requestType="delete",
+                                                 requestData=processedData,
+                                                 responseCode=deleteRecordResponseCode,
+                                                 responseMsg=deleteRecordResponseMsg)
+    # Sets response data mimetype
+    response.mimetype = "application/json"
     # Set response HTTP status code
     response.status_code = deleteRecordResponseCode
     # Returns response object

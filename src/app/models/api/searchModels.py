@@ -19,6 +19,6 @@ class SearchResult(BaseModel):
     data: Address
 
 class SearchResults(BaseModel):
-    searchQuery: SearchQuery
+    searchRequest: SearchQuery
     addressVerified: bool
     recommendedAddresses: Optional[List[SearchResult]] = Field(default=None)
