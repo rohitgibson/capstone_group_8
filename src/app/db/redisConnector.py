@@ -215,10 +215,12 @@ class RedisConnector(RedisBackupManager):
         try:
             searchResults = self.conn.ft(index_name="address_index").search(Query(searchQuery)).docs
         except ConnectionError as e:
-            # Return a 500 status code and an error message if a database connection error occurs.
+            # Return a 500 status code and an error message if a database 
+            # connection error occurs.
             return 500, {}, f"Database connection error: {e}. Please try again later."
         except Exception as e:
-            # Return a 500 status code and an error message if an unexpected error occurs.
+            # Return a 500 status code and an error message if an unexpected
+            # error occurs.
             return 500, {}, f"Miscellaneous server error: {e}. Please try again later."
         
         # Convert the search results to a list of dictionaries.
@@ -229,7 +231,8 @@ class RedisConnector(RedisBackupManager):
             # The address is verified if there are search results.
             addressVerified = True
 
-            # Create a dictionary containing the search request, address verification status, and recommended addresses.
+            # Create a dictionary containing the search request, address 
+            # verification status, and recommended addresses.
             searchDataResponseData = {
             "searchRequest": searchData,
             "addressVerified": addressVerified,
