@@ -13,7 +13,6 @@ redisConnector = RedisConnector()
 
 requestUtils = RequestUtils()
 
-
 # ENDPOINT - add address
 @app.route("/api/address/add", methods=["POST"])
 def addAddress():
@@ -27,7 +26,8 @@ def addAddress():
     response.data = requestUtils.processResponse(requestType="add",
                                                  requestData=processedData,
                                                  responseCode=addRecordResponseCode,
-                                                 responseMsg=addRecordResponseMsg)
+                                                 responseMsg=addRecordResponseMsg,
+                                                 responseData=None)
     # Sets response data mimetype
     response.mimetype = "application/json"
     # Sets response HTTP status code
@@ -49,9 +49,10 @@ def searchAddress():
     response.status_code = searchDataResponseCode
     # Sets response data
     response.data = requestUtils.processResponse(requestType="search",
-                                                 requestData=searchDataResponseData,
+                                                 requestData=processedData,
                                                  responseCode=searchDataResponseCode,
-                                                 responseMsg=searchRequestMsg)
+                                                 responseMsg=searchRequestMsg,
+                                                 responseData=searchDataResponseData)
     # Sets response data mimetype
     response.mimetype = "application/json"
     # Returns response object
@@ -71,7 +72,8 @@ def updateAddress():
     response.data = requestUtils.processResponse(requestType="update",
                                                  requestData=processedData,
                                                  responseCode=updateRecordResponseCode,
-                                                 responseMsg=updateRecordResponseMsg)
+                                                 responseMsg=updateRecordResponseMsg,
+                                                 responseData=None)
     # Sets response data mimetype
     response.mimetype = "application/json"
     # Sets response HTTP status code
@@ -94,7 +96,8 @@ def deleteAddress():
     response.data = requestUtils.processResponse(requestType="delete",
                                                  requestData=processedData,
                                                  responseCode=deleteRecordResponseCode,
-                                                 responseMsg=deleteRecordResponseMsg)
+                                                 responseMsg=deleteRecordResponseMsg,
+                                                 responseData=None)
     # Sets response data mimetype
     response.mimetype = "application/json"
     # Set response HTTP status code

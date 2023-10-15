@@ -1,21 +1,21 @@
 from typing import Optional, Union, Any
 from enum import Enum
-from uuid import uuid4
+from uuid import uuid4, UUID
 
 # from redis_om import HashModel, VectorFieldOptions, Field
 from pydantic import BaseModel, ValidationError, field_validator, constr, Field, ConfigDict
 
 from models.db.addressModels import Address
-from models.api.searchModels import SearchResults
+from models.api.searchModels import SearchAddress, SearchResults
 
 class AddAddress(BaseModel):
     model_config = ConfigDict(str_to_upper=True, str_strip_whitespace=True)
 
-    data: Address
+    address: Address
 
 class UpdateAddress(BaseModel):
     key: str    
-    data: Address
+    address: Address
 
     @field_validator('key')
     @classmethod
@@ -38,15 +38,3 @@ class DeleteAddress(BaseModel):
         else:
             raise ValueError("Key in incorrect format. Must begin with 'address.'")
         
-
-class RequestTypes(str, Enum):
-    add = "add"
-    search = "search"
-    update = "update"
-    delete = "delete"
-
-class RequestResponse(BaseModel):
-    requestType: RequestTypes
-    requestData: Union[AddAddress, UpdateAddress, DeleteAddress, SearchResults, dict]
-    requestSuccess: bool
-    responseMsg: str

@@ -1,17 +1,16 @@
 from uuid import uuid4
 from time import sleep
-from typing import Union, Any, Iterable
+from typing import Any, Iterable
 
 import simplejson as json
 from redis import Redis, ConnectionError
 from redis.commands.search.query import Query
 from pydantic import ValidationError
-import pandas as pd
 
 from utils.makeFuzzy import MakeFuzzy
 
 from models.api.modifyModels import AddAddress, DeleteAddress, UpdateAddress
-from models.api.searchModels import SearchRequest, SearchResults
+from models.api.searchModels import SearchAddress, SearchResults
 
 from db.redisBackupManager import RedisBackupManager
 
@@ -24,10 +23,13 @@ class RedisConnector(RedisBackupManager):
     def __init__(self):        
         # Establishes Redis connection for all subsequent requests
         self.conn = Redis(decode_responses=True)
+
         # Attempts to create a search index
         self.createIndex()
+
         # Creates instance of MakeFuzzy util for RediSearch Levenshtein distance fuzzy matching
         self.makeFuzzy = MakeFuzzy()
+
         print("Successfully started Redis connector class.")
         # logging.info("Successfully started Redis connector class.")
     
@@ -106,7 +108,7 @@ class RedisConnector(RedisBackupManager):
 
         # Validate the address data using the AddAddress model.
         try:
-            newAddress = AddAddress(**data).model_dump()
+            newAddress = AddAddress(**data).model_dump()["address"]
         except ValidationError as e:
             # Return a 400 status code and an error message if the address data is invalid.
             return 400, f"Address validation failed: {e}"
@@ -114,14 +116,11 @@ class RedisConnector(RedisBackupManager):
             # Return a 500 status code and an error message if an unexpected error occurs.
             return 500, f"Miscellaneous server error: {e}. Please try again later."
         
-        # Convert the address data to a Python dictionary.
-        data = dict(newAddress["data"])
-        
         # Set the address record in Redis using the json().set() command.
         try:
             self.conn.json().set(name=f"address:{str(uuid4())}",
                                  path="$",
-                                 obj=data)    
+                                 obj=newAddress)    
         except ConnectionError as e:
             # Return a 500 status code and an error message if a database connection error occurs.
             return 500, f"Database connection error: {e}. Please try again later."
@@ -189,7 +188,7 @@ class RedisConnector(RedisBackupManager):
 
         # Performs model validation check on inbound data
         try:
-            searchData = SearchRequest(**data).model_dump()["data"]
+            searchData = SearchAddress(**data).model_dump()["address"]
         except ValidationError as e:
             return 400, {}, f"Search validation failed: {e}"
         except Exception as e:
@@ -223,7 +222,7 @@ class RedisConnector(RedisBackupManager):
             return 500, {}, f"Miscellaneous server error: {e}. Please try again later."
         
         # Convert the search results to a list of dictionaries.
-        searchResults = [{'key':result["id"],"data":json.loads(result["json"])} for result in searchResults]
+        searchResults = [{'key':result["id"],"address":json.loads(result["json"])} for result in searchResults]
 
         # Check if the search results are empty.
         if searchResults != []:
@@ -266,7 +265,7 @@ class RedisConnector(RedisBackupManager):
 
         # Performs model validation check on inbound data
         try:
-            updateAddress = UpdateAddress(**data).model_dump()
+            updateAddress = UpdateAddress(**data).model_dump()["address"]
         except ValidationError as e:
             return 400, f"Update validation failed: {e}"
         except Exception as e: 
@@ -282,8 +281,7 @@ class RedisConnector(RedisBackupManager):
 
         # Key update logic
         try:
-            data = dict(updateAddress["data"])
-            print(data)
+            data = updateAddress["data"]
             self.conn.json().set(name=f"{key}",
                                  path="$",
                                  obj=data)
@@ -306,7 +304,6 @@ class RedisConnector(RedisBackupManager):
             A tuple of (status code, message)
         """
 
-        # Performs model verification on request data
         try:
             deleteAddress = DeleteAddress(**data).model_dump()
         except ValidationError as e:
@@ -314,7 +311,6 @@ class RedisConnector(RedisBackupManager):
         except Exception as e: 
             return 500, f"Miscellaneous server error: {e}"
 
-        # Performs check on db to verify key exists 
         key = deleteAddress["key"]
         key_exists:bool = self.checkKeyExists(key=key)
         if key_exists is False:
@@ -322,7 +318,6 @@ class RedisConnector(RedisBackupManager):
         else:
             pass
 
-        # Deletes key in Redis DB
         try:
             key = deleteAddress["key"]
             self.conn.json().delete(key=f"{key}",
