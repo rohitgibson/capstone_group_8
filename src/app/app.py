@@ -9,31 +9,16 @@ from utils.requestUtils import RequestUtils
 
 app = Flask(__name__)
 
-# auth = HTTPBasicAuth()
-# authContext = AuthContext()
-
 redisConnector = RedisConnector()
 
 requestUtils = RequestUtils()
-
-# @auth.verify_password
-# def verifyPassword(username, password):
-#     user = authContext.verifyUserCredentials(username=username, password=password)
-    
-#     return user
-
-# @auth.get_user_roles
-# def getUserRoles(username):
-#     role = authContext.verifyUserRole(username=username)
-    
-#     return role
 
 
 # ENDPOINT - add address
 @app.route("/api/address/add", methods=["POST"])
 def addAddress():
     # Loads data from request
-    processedData = requestUtils.processRequestData(data=request.data)
+    processedData = requestUtils.processRequestData(data=request.data, origin="add")
     # Adds data to Redis db
     addRecordResponseCode, addRecordResponseMsg = redisConnector.addRecord(data=processedData)
     # Creates response object
@@ -55,7 +40,7 @@ def addAddress():
 @app.route("/api/address/search", methods=["GET"])
 def searchAddress():
     # Loads data from request
-    processedData = requestUtils.processRequestData(data=request.data)
+    processedData = requestUtils.processRequestData(data=request.data, origin="search")
     # Sends search query to Redis
     searchDataResponseCode, searchDataResponseData, searchRequestMsg = redisConnector.searchData(data=processedData)
     # Creates response object
@@ -77,7 +62,7 @@ def searchAddress():
 @app.route("/api/address/modify/update", methods=["POST"])
 def updateAddress():
     # Loads data from request
-    processedData = requestUtils.processRequestData(data=request.data)
+    processedData = requestUtils.processRequestData(data=request.data, origin="update")
     # Updates data in Redis
     updateRecordResponseCode, updateRecordResponseMsg = redisConnector.updateRecord(data=processedData)
     # Creates response object
@@ -100,7 +85,7 @@ def updateAddress():
 @app.route("/api/address/modify/delete", methods=["POST"])
 def deleteAddress():
     # Loads data from request
-    processedData = requestUtils.processRequestData(data=request.data)
+    processedData = requestUtils.processRequestData(data=request.data, origin="delete")
     # Deletes data in Redis
     deleteRecordResponseCode, deleteRecordResponseMsg = redisConnector.deleteRecord(data=processedData)
     # Creates response object
@@ -116,6 +101,7 @@ def deleteAddress():
     response.status_code = deleteRecordResponseCode
     # Returns response object
     return response
+
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5005, debug=True)

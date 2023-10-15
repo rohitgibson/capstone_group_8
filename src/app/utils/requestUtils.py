@@ -1,12 +1,14 @@
 import simplejson as json
 
+from pydantic import ValidationError
+
 from models.api.modifyModels import RequestResponse
 
 class RequestUtils:
     def __init__(self):
         pass
     
-    def processRequestData(self, data:bytes) -> dict:
+    def processRequestData(self, data:bytes, origin:str) -> dict:
         try:
             processedData = json.loads(data)
         except Exception as e:

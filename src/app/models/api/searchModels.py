@@ -4,21 +4,16 @@ from pydantic import BaseModel, constr, Field, ValidationError, model_validator,
 
 from models.db.addressModels import CountryEnum, StateEnum, ProvEnum, Address
 
-class SearchQuery(BaseModel):
+class SearchRequest(BaseModel):
     model_config = ConfigDict(str_to_upper=True, str_strip_whitespace=True)
 
-    addressLine1: str
-    addressLine2: str
-    city: str 
-    stateProv: Union[StateEnum, ProvEnum] 
-    postalCode: str 
-    country: CountryEnum 
+    data: Address
 
 class SearchResult(BaseModel):
     key: str
     data: Address
 
 class SearchResults(BaseModel):
-    searchRequest: SearchQuery
+    searchRequest: Address
     addressVerified: bool
     recommendedAddresses: Optional[List[SearchResult]] = Field(default=None)

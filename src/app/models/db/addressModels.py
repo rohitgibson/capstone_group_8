@@ -85,10 +85,10 @@ class StateEnum(str, Enum):
 class Address(BaseModel):
     model_config = ConfigDict(str_to_upper=True, str_strip_whitespace=True)
 
-    firstName: str
-    lastName: str 
-    addressLine1: str
-    addressLine2: str 
+    # firstName: str = Field(min_length=1)
+    # lastName: str = Field(min_length=1)
+    addressLine1: str 
+    addressLine2: Optional[str] = Field(default="")
     city: str 
     stateProv: Union[StateEnum, ProvEnum] 
     postalCode: str 
