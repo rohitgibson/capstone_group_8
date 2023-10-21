@@ -11,7 +11,7 @@ from models.api.searchModels import SearchAddress, SearchResults
 class AddAddress(BaseModel):
     model_config = ConfigDict(str_to_upper=True, str_strip_whitespace=True)
 
-    address: Address
+    address: Union[Address, list[Address]]
 
 class UpdateAddress(BaseModel):
     key: str    

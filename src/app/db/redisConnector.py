@@ -197,19 +197,30 @@ class RedisConnector(RedisBackupManager):
         # Construct the Redis search query.
         if searchData["addressLine2"] != "":
             searchQuery = f"""
-            @addressLine1:({self.makeFuzzy.execute(query_text=searchData["addressLine1"])}) 
-            @addressLine2:{self.makeFuzzy.execute(query_text=searchData["addressLine2"])} 
-            @city:({self.makeFuzzy.execute(query_text=searchData["city"])}) 
-            @stateProv:{self.makeFuzzy.execute(query_text=searchData["stateProv"])} 
-            @postalCode:{self.makeFuzzy.execute(query_text=searchData["postalCode"])} 
-            @country:{self.makeFuzzy.execute(query_text=searchData["country"])}"""
+            @addressLine1:({self.makeFuzzy.execute(query_text=searchData["addressLine1"],
+                                                   wildcard_pattern="%")}) 
+            @addressLine2:{self.makeFuzzy.execute(query_text=searchData["addressLine2"],
+                                                  wildcard_pattern="%")} 
+            @city:({self.makeFuzzy.execute(query_text=searchData["city"],
+                                           wildcard_pattern="%")}) 
+            @stateProv:{self.makeFuzzy.execute(query_text=searchData["stateProv"],
+                                               wildcard_pattern="%")} 
+            @postalCode:{self.makeFuzzy.execute(query_text=searchData["postalCode"],
+                                                wildcard_pattern="%%")} 
+            @country:{self.makeFuzzy.execute(query_text=searchData["country"],
+                                             wildcard_pattern="%")}"""
         else:
             searchQuery = rf"""
-            @addressLine1:({self.makeFuzzy.execute(query_text=searchData["addressLine1"])}) 
-            @city:({self.makeFuzzy.execute(query_text=searchData["city"])}) 
-            @stateProv:({self.makeFuzzy.execute(query_text=searchData["stateProv"])}) 
-            @postalCode:{self.makeFuzzy.execute(query_text=searchData["postalCode"])} 
-            @country:{self.makeFuzzy.execute(query_text=searchData["country"])}"""       
+            @addressLine1:({self.makeFuzzy.execute(query_text=searchData["addressLine1"],
+                                                   wildcard_pattern="%")}) 
+            @city:({self.makeFuzzy.execute(query_text=searchData["city"],
+                                           wildcard_pattern="%")}) 
+            @stateProv:({self.makeFuzzy.execute(query_text=searchData["stateProv"],
+                                                wildcard_pattern="%")}) 
+            @postalCode:{self.makeFuzzy.execute(query_text=searchData["postalCode"],
+                                                wildcard_pattern="%%")} 
+            @country:{self.makeFuzzy.execute(query_text=searchData["country"],
+                                             wildcard_pattern="%")}"""       
 
         # Search for addresses in Redis.
         try:
