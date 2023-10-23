@@ -1,5 +1,7 @@
+from asyncio import get_event_loop
+
 import simplejson as json
-from flask import Flask, request, make_response, jsonify
+from quart import Quart, request, Response
 from flask_httpauth import HTTPBasicAuth
 from werkzeug.security import check_password_hash
 
@@ -7,101 +9,121 @@ from db.redisConnector import RedisConnector
 # from auth.authContext import AuthContext
 from utils.requestUtils import RequestUtils
 
-app = Flask(__name__)
+app = Quart(__name__)
+
 
 redisConnector = RedisConnector()
-
 requestUtils = RequestUtils()
+
+@app.before_serving
+async def startup():
+    loop = get_event_loop()
+    loop.create_task(redisConnector.healthCheck())
 
 # ENDPOINT - add address
 @app.route("/api/address/add", methods=["POST"])
-def addAddress():
+async def addAddress():
     # Loads data from request
-    processedData = requestUtils.processRequestData(data=request.data, origin="add")
+    data:bytes = await request.get_data()
+    # Converts data to Python dictionary
+    processedData = requestUtils.processRequestData(data=data, origin="add")
     # Adds data to Redis db
     addRecordResponseCode, addRecordResponseMsg = redisConnector.addRecord(data=processedData)
-    # Creates response object
-    response = make_response('Response')
     # Sets response data
-    response.data = requestUtils.processResponse(requestType="add",
+    response_data = requestUtils.processResponse(requestType="add",
                                                  requestData=processedData,
                                                  responseCode=addRecordResponseCode,
                                                  responseMsg=addRecordResponseMsg,
                                                  responseData=None)
     # Sets response data mimetype
-    response.mimetype = "application/json"
+    response_mimetype = "application/json"
     # Sets response HTTP status code
-    response.status_code = addRecordResponseCode
+    response_status_code = addRecordResponseCode
+    # Creates response object
+    response = Response(response=response_data,
+                        status=response_status_code,
+                        mimetype=response_mimetype)
     # Returns response object
     return response
 
 
 # ENDPOINT - search address
 @app.route("/api/address/search", methods=["GET"])
-def searchAddress():
+async def searchAddress():
     # Loads data from request
-    processedData = requestUtils.processRequestData(data=request.data, origin="search")
+    data:bytes = await request.get_data()
+    # Loads data from request
+    processedData = requestUtils.processRequestData(data=data, origin="search")
     # Sends search query to Redis
     searchDataResponseCode, searchDataResponseData, searchRequestMsg = redisConnector.searchData(data=processedData)
-    # Creates response object
-    response = make_response('Response')
-    # Sets response HTTP status code
-    response.status_code = searchDataResponseCode
     # Sets response data
-    response.data = requestUtils.processResponse(requestType="search",
+    response_data = requestUtils.processResponse(requestType="search",
                                                  requestData=processedData,
                                                  responseCode=searchDataResponseCode,
                                                  responseMsg=searchRequestMsg,
                                                  responseData=searchDataResponseData)
     # Sets response data mimetype
-    response.mimetype = "application/json"
+    response_mimetype = "application/json"
+    # Sets response HTTP status code
+    response_status_code = searchDataResponseCode
+    # Creates response object
+    response = Response(response=response_data,
+                        status=response_status_code,
+                        mimetype=response_mimetype)
     # Returns response object
     return response
 
 
 # ENDPOINT - update address
 @app.route("/api/address/modify/update", methods=["POST"])
-def updateAddress():
+async def updateAddress():
     # Loads data from request
-    processedData = requestUtils.processRequestData(data=request.data, origin="update")
+    data:bytes = await request.get_data()
+    # Loads data from request
+    processedData = requestUtils.processRequestData(data=data, origin="update")
     # Updates data in Redis
     updateRecordResponseCode, updateRecordResponseMsg = redisConnector.updateRecord(data=processedData)
-    # Creates response object
-    response = make_response('Response')
     # Sets response data
-    response.data = requestUtils.processResponse(requestType="update",
+    response_data = requestUtils.processResponse(requestType="update",
                                                  requestData=processedData,
                                                  responseCode=updateRecordResponseCode,
                                                  responseMsg=updateRecordResponseMsg,
                                                  responseData=None)
     # Sets response data mimetype
-    response.mimetype = "application/json"
+    response_mimetype = "application/json"
     # Sets response HTTP status code
-    response.status_code = updateRecordResponseCode
-
+    response_status_code = updateRecordResponseCode
+    # Creates response object
+    response = Response(response=response_data,
+                        status=response_status_code,
+                        mimetype=response_mimetype)
     # Returns response object
     return response
 
 
 # ENDPOINT - delete address
 @app.route("/api/address/modify/delete", methods=["POST"])
-def deleteAddress():
+async def deleteAddress():
     # Loads data from request
-    processedData = requestUtils.processRequestData(data=request.data, origin="delete")
+    data:bytes = await request.get_data()
+    # Loads data from request
+    processedData = requestUtils.processRequestData(data=data, origin="delete")
     # Deletes data in Redis
     deleteRecordResponseCode, deleteRecordResponseMsg = redisConnector.deleteRecord(data=processedData)
-    # Creates response object
-    response = make_response('Response')
     # Sets response data
-    response.data = requestUtils.processResponse(requestType="delete",
+    response_data = requestUtils.processResponse(requestType="delete",
                                                  requestData=processedData,
                                                  responseCode=deleteRecordResponseCode,
                                                  responseMsg=deleteRecordResponseMsg,
                                                  responseData=None)
     # Sets response data mimetype
-    response.mimetype = "application/json"
+    response_mimetype = "application/json"
     # Set response HTTP status code
-    response.status_code = deleteRecordResponseCode
+    response_status_code = deleteRecordResponseCode
+    # Creates response object
+    response = Response(response=response_data,
+                        status=response_status_code,
+                        mimetype=response_mimetype)
     # Returns response object
     return response
 

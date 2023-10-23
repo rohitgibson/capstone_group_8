@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Union, Literal, Any
 import simplejson 
 
 import requests
@@ -27,30 +27,9 @@ class AvsRequests:
                     "responseStatusMsg": "Issues were encountered while processing your request. Try again later."}
         
 
-    def addRequest(self, request_data:dict[str, Any], credentials:dict[str, Any]):
-        request_method = "POST"
-        request_url = f"{AVS_API_CONF['tgt_uri']}{AVS_API_CONF['add_endpoint']}"
-        request_basicauth = HTTPBasicAuth(username=credentials["username"],
-                                          password=credentials["password"])
-        request_json = simplejson.dumps(request_data)
-
-        response_data = self.sendRequest(method=request_method,
-                                         url=request_url,
-                                         auth=request_basicauth,
-                                         json=request_json)
-        
-        add_response_data = {
-            "requestSuccessful": response_data["requestSuccessful"],
-            "responseStatusMsg": response_data["responseStatusMsg"]
-        }
-
-
-        return add_response_data
-
-
-    def searchRequest(self, request_data:dict[str, Any], credentials:dict[str, Any]):
+    def dbSearchRequest(self, request_data:dict[str, Any], credentials:dict[str, Any]):
         request_method = "GET"
-        request_url = f"{AVS_API_CONF['tgt_uri']}{AVS_API_CONF['search_endpoint']}"
+        request_url = AVS_API_CONF['tgt_uri'] + AVS_API_CONF['search_endpoint']
         request_basicauth = HTTPBasicAuth(username=credentials["username"],
                                           password=credentials["password"])
         request_json = simplejson.dumps(request_data)
@@ -60,19 +39,27 @@ class AvsRequests:
                                          auth=request_basicauth,
                                          json=request_json)
         
-        search_response_data = {
-            "requestSuccessful": response_data["requestSuccessful"],
-            "responseStatusMsg": response_data["responseStatusMsg"],
-            "addressVerified": response_data["responseData"]["addressVerified"],
-            "recommendedAddresses": response_data["responseData"]["recommendedAddresses"]
-        }
+        try:
+            response_data = {
+                "requestSuccessful": response_data["requestSuccessful"],
+                "responseStatusMsg": response_data["responseStatusMsg"],
+                "addressVerified": response_data["responseData"]["addressVerified"],
+                "recommendedAddresses": response_data["responseData"]["recommendedAddresses"]
+            }
+        except Exception:
+            response_data = {
+                "requestSuccessful": response_data["requestSuccessful"],
+                "responseStatusMsg": response_data["responseStatusMsg"]
+            }
 
-        return search_response_data
-    
+        return response_data
 
-    def updateRequest(self, request_data:dict[str, Any], credentials:dict[str, Any]):
+
+    def dbModifyRequest(self, operation:Union[Literal["add"], Literal["modify"], Literal["delete"]], 
+                        request_data:dict[str, Any], 
+                        credentials:dict[str, Any])  -> dict[str, Any]:
         request_method = "POST"
-        request_url = f"{AVS_API_CONF['tgt_uri']}{AVS_API_CONF['update_endpoint']}"
+        request_url = AVS_API_CONF['tgt_uri'] + AVS_API_CONF[f'{operation}_endpoint']
         request_basicauth = HTTPBasicAuth(username=credentials["username"],
                                           password=credentials["password"])
         request_json = simplejson.dumps(request_data)
@@ -82,31 +69,11 @@ class AvsRequests:
                                          auth=request_basicauth,
                                          json=request_json)
         
-        update_response_data = {
+        response_data = {
             "requestSuccessful": response_data["requestSuccessful"],
             "responseStatusMsg": response_data["responseStatusMsg"]
         }
 
-        return update_response_data
-
-
-    def deleteRequest(self, request_data:dict[str, Any], credentials:dict[str, Any])  -> dict[str, Any]:
-        request_method = "POST"
-        request_url = f"{AVS_API_CONF['tgt_uri']}{AVS_API_CONF['delete_endpoint']}"
-        request_basicauth = HTTPBasicAuth(username=credentials["username"],
-                                          password=credentials["password"])
-        request_json = simplejson.dumps(request_data)
-
-        response_data = self.sendRequest(method=request_method,
-                                         url=request_url,
-                                         auth=request_basicauth,
-                                         json=request_json)
-        
-        delete_response_data = {
-            "requestSuccessful": response_data["requestSuccessful"],
-            "responseStatusMsg": response_data["responseStatusMsg"]
-        }
-
-        return delete_response_data
+        return response_data
 
 

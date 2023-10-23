@@ -12,9 +12,9 @@ from utils.makeFuzzy import MakeFuzzy
 from models.api.modifyModels import AddAddress, DeleteAddress, UpdateAddress
 from models.api.searchModels import SearchAddress, SearchResults
 
-from db.redisBackupManager import RedisBackupManager
+from db.redisRestore import RedisRestore
 
-class RedisConnector(RedisBackupManager):
+class RedisConnector(RedisRestore):
     """
     Handles all interactions with RedisDB from defining connection parameters
     to the Add, Validate/Search, Update, and Delete address use cases.    
