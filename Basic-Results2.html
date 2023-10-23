@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+  </style>
+  <link href="daCSS.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+	<a href="Basic-Home.html" class="home-button">Basic Home</a>
+  <div class="login-container">
+    <div class="result-label">First Name:</div>
+    <div class="result-value" id="first-name"></div>
+	<div class="result-label">Last Name:</div>
+	<div class="result-value" id="last-name"></div>
+	<div class="result-label">Address Line 1:</div>
+    <div class="result-value" id="address"></div>
+	<div class="result-label">Address Line 2:</div>
+	<div class="result-value" id="address two"></div>
+    <div class="result-label">City:</div>
+    <div class="result-value" id="city"></div>
+    <div class="result-label">State or Providence:</div>
+    <div class="result-value" id="stateProv"></div>
+	<div class="result-label">Country:</div>
+    <div class="result-value" id="country"></div>
+    <div class="result-label">Postal Code:</div>
+    <div class="result-value" id="postal"></div>
+<a href="Basic-Search.html" class="search-again">Search Again</a>
+    
+  </div>
+
+  	<script>
+    
+    const urlParams = new URLSearchParams(window.location.search);
+    const address = urlParams.get('address');
+    const city = urlParams.get('city');
+    const state = urlParams.get('state');
+    const zip = urlParams.get('zip');
+
+
+    document.getElementById('address').textContent = address;
+    document.getElementById('city').textContent = city;
+    document.getElementById('state').textContent = state;
+    document.getElementById('zip').textContent = zip;
+  </script>
+</body>
+</html>
