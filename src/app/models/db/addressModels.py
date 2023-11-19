@@ -33,7 +33,7 @@ class Address(BaseModel):
         `country` field.
 
         Args:
-            ``self``: 
+            `self`: 
                 The `Address` object.
 
         Returns:

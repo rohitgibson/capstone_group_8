@@ -1,29 +1,38 @@
-import mysql.connector as mariadb
+from os import makedirs
+import sqlite3
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+from models.db.authModels import Role, User
+from utils.miscUtils import MiscUtils
 
 class AuthConnection:
     # Begin Connection Init Workflow
-    def __init__(self):
-        """ Initializes connection with auth credentials database.
+    def __init__(self, current_working_dir:str):
+        """ 
+        Creates and initializes connection with the auth credentials database.
         
         
         """
+        self.cwd = current_working_dir
+
+        self.miscUtils = MiscUtils()
+
+
         self.openConnection()
-        # self.
 
         
     def openConnection(self):
         """ Opens connection to auth credentials database
         
         """
+        
+
         try:
-            self.conn = mariadb.connect(
-                user="cred_user",
-                password="cred_pass",
-                host="localhost",
-                port=3306,
-                database="auth_db"
-            )
-            self.cursor = self.conn.cursor()
+            self.miscUtils.createPath(rf"{self.cwd}/db")
+            
+            
         except Exception as e:
             print("Attempted to start auth database connection. Encountered an error:",e)
             exit(1)

@@ -46,8 +46,11 @@ class AuthCheckUserRole():
         return role
 
 class AuthVerification(AuthCheckUserCredentials, AuthCheckUserRole):
-    def __init__(self):
+    def __init__(self, current_working_dir:str):
+        self.authConnection = AuthConnection(current_working_dir=current_working_dir)
+
         self.storedCredentials = {}
+        self.authCheckUserRole = AuthCheckUserRole()
 
     def verifyUserCredentials(self, username, password):
         user = self.checkUserCredentials(username=username,password=password)

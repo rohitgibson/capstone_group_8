@@ -99,7 +99,7 @@ class RedisConnector(RedisRestore):
         Processes Redis record add request.
 
         Args:
-            ``data``: 
+            `data`: 
                 API request data (converted to dict)
 
         Returns:
@@ -136,7 +136,7 @@ class RedisConnector(RedisRestore):
         Processes bulk add request for mass data ingest and recovery
 
         Args:
-            ``bulkData``: 
+            `bulkData`: 
                 Iterable address data to be added to RedisDB
 
         Returns:
@@ -178,7 +178,7 @@ class RedisConnector(RedisRestore):
         the search results and verification status.
 
         Args:
-            ``data``:
+            `data`:
                 API request data (converted to dict)
 
         Returns:
@@ -270,7 +270,7 @@ class RedisConnector(RedisRestore):
         Processes Redis record update request.
 
         Args:
-            ``data``: 
+            `data`: 
                 API request data (converted to dict)
 
          Returns:
@@ -312,7 +312,8 @@ class RedisConnector(RedisRestore):
         Processes Redis record deletion request.
 
         Args:
-            ``data``: API request data (converted to dict)
+            `data`: 
+                API request data (converted to dict)
 
         Returns:
             A tuple of (status code, message)
