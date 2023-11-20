@@ -21,6 +21,8 @@ requestUtils = RequestUtils()
 #     loop = get_event_loop()
 #     loop.create_task(redisConnector.healthCheck())
 
+
+
 # ENDPOINT - add address
 @app.route("/api/address/add", methods=["POST"])
 async def addAddress():
