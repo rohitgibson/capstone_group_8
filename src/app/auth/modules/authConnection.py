@@ -1,10 +1,10 @@
 import sqlite3
 from typing import Any
-from hashlib import sha256
 from uuid import uuid4
 
 from sqlalchemy import create_engine, select, update, delete
 from sqlalchemy.orm import Session
+from werkzeug.security import generate_password_hash
 
 from models.db.authModels import Role, RoleCheck, User, UserCheck, Base
 from utils.miscUtils import MiscUtils
@@ -15,7 +15,13 @@ class AuthConnection:
         """ 
         Creates and initializes connection with the auth credentials database.
         
-        
+        Args:
+            `current_working_dir`:
+                A string representing the current working directory for the
+                AuthContext class. Used to create a filepath for the auth database.
+
+        Returns:
+            None.
         """
         
         # Sets current working directory
@@ -74,8 +80,9 @@ class AuthConnection:
 
     def rolesTableDelete(self, name:str):
         try:
+            RoleCheck.model_validate({"name": name})
             delete_statement = delete(Role).where(Role.name == name)
-            print(delete_statement)
+
             self.db_session.execute(delete_statement)
             self.db_session.commit()
         except Exception as e:
@@ -87,7 +94,7 @@ class AuthConnection:
             UserCheck.model_validate({"username": username, "password": password, "role": role})
             new_user = User(id=str(uuid4()),
                             username=username,
-                            password=sha256(f"{password}{self.secret_key}".encode()).digest(),
+                            password=generate_password_hash(password=password),
                             role=role)
             
             self.db_session.add(instance=new_user)
@@ -112,7 +119,7 @@ class AuthConnection:
         print(username, changes)
         try:
             update_statement = update(User).where(User.username == username).values(username=changes['username'],
-                                                                                    password=sha256(f"{changes['password']}{self.secret_key}".encode()).digest(),
+                                                                                    password=generate_password_hash(password=changes["password"]),
                                                                                     role=changes["role"])
             print(update_statement)
             self.db_session.execute(update_statement)

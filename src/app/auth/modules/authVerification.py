@@ -1,63 +1,56 @@
 from typing import Union
 
+from hashlib import sha256
 from werkzeug.security import check_password_hash
 
 from auth.modules.authConnection import AuthConnection
 
-class AuthCheckUserCredentials():
-    def __init__(self):
-        pass
+class AuthVerification:
+    def __init__(self, current_working_dir:str):
+        self.authConnection = AuthConnection(current_working_dir=current_working_dir)
+        self.prev_authd_users = [{}]
 
-    def checkUserCredentials(self, username, password) -> Union[str, None]:
-        """ Executes user credential check workflow
+    def checkUserCredentials(self, username:str, password:str) -> Union[str, None]:
+        """ 
+        Executes user credential check workflow
         
         """
         # Checks previously auth'd users for quick match
-        
-        # If no match in previously auth'd users, checks
-
-        return ""
-    
-    def checkAuthedUsers(self, username) -> Union[str, None]:
-
-
-        pass
-
-    def checkDbUsers(self, username, password) -> Union[str, None]:
-
-
-        pass
-
-    def checkPassword(self, password) -> bool:
-
-
-        return False
-
-class AuthCheckUserRole():
-    def __init__(self):
-        pass
-
-    def checkUserRole(self, username:str, storedCredentials:dict) -> Union[str, None]:
-        if username in list(storedCredentials.keys()):
-            role = storedCredentials["username"]
+        user_pass, user_role = self.checkAuthdUsers(username=username)
+        # If no match in previously auth'd users, checks auth database
+        if None in [user_pass, user_role]:
+            user_pass, user_role = self.checkDbUsers(username=username)
+            password_valid = self.checkPassword(user_pass=str(user_pass), password=str(password))
         else:
-            role = None
+            password_valid = self.checkPassword(user_pass=str(user_pass), password=password)
+        # Check that the passwords match
+        if password_valid is True:
+            self.prev_authd_users.append({"username":username, "password":user_pass, "role":user_role})
+            return user_role
+        else: 
+            return None
+    
+    def checkAuthdUsers(self, username:str) -> Union[tuple[str, str], tuple[None, None]]:
+        try:
+            filter_prev_authd_users = list(filter(lambda user: user["username"] == username, self.prev_authd_users))
+        except Exception as e:
+            print(e)
+            return None, None
 
-        return role
+        if filter_prev_authd_users != []:
+            return filter_prev_authd_users[0]["password"], filter_prev_authd_users[0]["role"]
+        else:
+            return None, None
 
-class AuthVerification(AuthCheckUserCredentials, AuthCheckUserRole):
-    def __init__(self, current_working_dir:str):
-        self.authConnection = AuthConnection(current_working_dir=current_working_dir)
+    def checkDbUsers(self, username:str) -> Union[tuple[str, str], tuple[None, None]]:
+        auth_db_matching_users = self.authConnection.usersTableRead(username=username)
 
-        self.storedCredentials = {}
-        self.authCheckUserRole = AuthCheckUserRole()
+        if auth_db_matching_users != []:
+            return auth_db_matching_users[0]["password"], auth_db_matching_users[0]["role"]
+        else:
+            return None, None
 
-    def verifyUserCredentials(self, username, password):
-        user = self.checkUserCredentials(username=username,password=password)
+    def checkPassword(self, user_pass:str, password:str) -> bool:
+        return check_password_hash(pwhash=user_pass, password=password)
+    
 
-        return user
-
-    def verifyUserRole(self, username:str):
-        role = self.checkUserRole(username=username, storedCredentials=self.storedCredentials)
-
-        return role

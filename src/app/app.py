@@ -2,7 +2,7 @@ from asyncio import get_event_loop
 
 import simplejson as json
 from quart import Quart, request, Response
-from quart_auth import AuthUser, current_user, login_required, QuartAuth
+from quart_auth import QuartAuth, AuthUser, basic_auth_required
 from werkzeug.security import check_password_hash
 
 from db.redisConnector import RedisConnector
@@ -10,11 +10,14 @@ from auth.authContext import AuthContext
 from utils.requestUtils import RequestUtils
 
 app = Quart(__name__)
-
-
+QuartAuth(app=app)
 
 redisConnector = RedisConnector()
 requestUtils = RequestUtils()
+
+authContext = AuthContext()
+
+
 
 # @app.before_serving
 # async def startup():
