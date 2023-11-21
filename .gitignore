@@ -1,5 +1,0 @@
-# ignore all .pyc files
-*.pyc
-
-# ignore auth database
-*auth.db
