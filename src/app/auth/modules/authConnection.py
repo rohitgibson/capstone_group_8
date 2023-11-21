@@ -27,9 +27,6 @@ class AuthConnection:
         # Sets current working directory
         self.cwd = current_working_dir
 
-        # Sets hash for passwords
-        self.secret_key = "bruh"
-
         # Initializes MiscUtils for path creation
         self.miscUtils = MiscUtils()
 

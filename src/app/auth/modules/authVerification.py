@@ -1,4 +1,5 @@
 from typing import Union
+from time import time
 
 from hashlib import sha256
 from werkzeug.security import check_password_hash
@@ -16,13 +17,19 @@ class AuthVerification:
         
         """
         # Checks previously auth'd users for quick match
+        t0 = time()
         user_pass, user_role = self.checkAuthdUsers(username=username)
         # If no match in previously auth'd users, checks auth database
+        t1 = time()
+        print(t1-t0)
         if None in [user_pass, user_role]:
             user_pass, user_role = self.checkDbUsers(username=username)
             password_valid = self.checkPassword(user_pass=str(user_pass), password=str(password))
         else:
-            password_valid = self.checkPassword(user_pass=str(user_pass), password=password)
+            password_valid = self.checkPassword(user_pass=str(user_pass), password=str(password))
+        
+        t2 = time()
+        print(t2-t1)
         # Check that the passwords match
         if password_valid is True:
             self.prev_authd_users.append({"username":username, "password":user_pass, "role":user_role})
@@ -51,6 +58,8 @@ class AuthVerification:
             return None, None
 
     def checkPassword(self, user_pass:str, password:str) -> bool:
-        return check_password_hash(pwhash=user_pass, password=password)
-    
+        t0 = time()
+        valid = check_password_hash(pwhash=user_pass, password=password)
+        print(time()-t0)
+        return valid
 

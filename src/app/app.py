@@ -1,34 +1,33 @@
 from asyncio import get_event_loop
 
-import simplejson as json
-from quart import Quart, request, Response
-from quart_auth import QuartAuth, AuthUser, basic_auth_required
-from werkzeug.security import check_password_hash
+from quart import Quart, request, Response, abort
+from quart.utils import run_sync
 
 from db.redisConnector import RedisConnector
 from auth.authContext import AuthContext
 from utils.requestUtils import RequestUtils
 
+# Inits quart app class
 app = Quart(__name__)
-QuartAuth(app=app)
 
+# Inits helper classes for DB, request handling, and auth
 redisConnector = RedisConnector()
 requestUtils = RequestUtils()
-
 authContext = AuthContext()
 
-
-
-# @app.before_serving
-# async def startup():
-#     loop = get_event_loop()
-#     loop.create_task(redisConnector.healthCheck())
-
-
+# Inits worker for keeping Redis from dying
+# @run_sync
+async def startup():
+    loop = get_event_loop()
+    loop.create_task(redisConnector.healthCheck())
 
 # ENDPOINT - add address
 @app.route("/api/address/add", methods=["POST"])
 async def addAddress():
+    permitted_roles = ["admin"]
+    # Loads request auth headers
+    authContext.authUser(permitted_roles=permitted_roles,
+                         auth_data=request.authorization)
     # Loads data from request
     data:bytes = await request.get_data()
     # Converts data to Python dictionary
@@ -56,6 +55,10 @@ async def addAddress():
 # ENDPOINT - search address
 @app.route("/api/address/search", methods=["GET"])
 async def searchAddress():
+    permitted_roles = ["admin", "basic"]
+    # Loads request auth headers
+    authContext.authUser(permitted_roles=permitted_roles,
+                         auth_data=request.authorization)
     # Loads data from request
     data:bytes = await request.get_data()
     # Loads data from request
@@ -83,6 +86,10 @@ async def searchAddress():
 # ENDPOINT - update address
 @app.route("/api/address/modify/update", methods=["POST"])
 async def updateAddress():
+    permitted_roles = ["admin"]
+    # Loads request auth headers
+    authContext.authUser(permitted_roles=permitted_roles,
+                         auth_data=request.authorization)
     # Loads data from request
     data:bytes = await request.get_data()
     # Loads data from request
@@ -110,6 +117,10 @@ async def updateAddress():
 # ENDPOINT - delete address
 @app.route("/api/address/modify/delete", methods=["POST"])
 async def deleteAddress():
+    permitted_roles = ["admin"]
+    # Loads request auth headers
+    authContext.authUser(permitted_roles=permitted_roles,
+                         auth_data=request.authorization)
     # Loads data from request
     data:bytes = await request.get_data()
     # Loads data from request

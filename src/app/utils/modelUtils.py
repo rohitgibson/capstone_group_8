@@ -36,8 +36,6 @@ class CheckPostalCode:
         postcodeValid:bool = self.checkPostalCodeInRange(country=country, 
                                                          postalCodeRange=postalCodeRange, 
                                                          postalCode=postalCode)
-        
-        print(postalCodeRange)
 
         return postcodeValid
 
