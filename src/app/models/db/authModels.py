@@ -4,7 +4,6 @@ from uuid import uuid4
 from sqlalchemy import String, ForeignKey
 from sqlalchemy.dialects.sqlite import BLOB
 from sqlalchemy.orm import DeclarativeBase, relationship, mapped_column, Mapped
-
 from pydantic import BaseModel, Field
 
 class Base(DeclarativeBase):

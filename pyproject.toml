@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "capstone-group-8"
+version = "0.1.0"
+description = ""
+authors = ["Rohit Gibson <89996347+rohitgibson@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+quart = "^0.19.4"
+sqlalchemy = "^2.0.23"
+pydantic = "^2.5.1"
+simplejson = "^3.19.2"
+redis = "^5.0.1"
+faker = "^20.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

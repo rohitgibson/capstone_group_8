@@ -2,8 +2,6 @@ from time import sleep
 
 from redis import Redis
 
-from boto3 import session
-
 class RedisRestore:
     def __init__(self) -> None:
         self.restore_conn = Redis()

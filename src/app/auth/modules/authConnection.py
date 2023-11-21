@@ -49,7 +49,9 @@ class AuthConnection:
             db_engine = create_engine(rf"sqlite:///{self.cwd}/db/auth.db")
             Base.metadata.create_all(db_engine)
             self.db_session = Session(db_engine)
-            self.usersTableCreate(username="root", password="root", role="admin")
+            self.usersTableCreate(username="root", password="root", role="root")
+            self.usersTableCreate(username="admin", password="admin", role="admin")
+            self.usersTableCreate(username="basic", password="basic", role="basic")
         except Exception as e:
             print("Attempted to connect to auth database. Encountered an error:",e)
             exit(1)
@@ -91,7 +93,7 @@ class AuthConnection:
             UserCheck.model_validate({"username": username, "password": password, "role": role})
             new_user = User(id=str(uuid4()),
                             username=username,
-                            password=generate_password_hash(password=password),
+                            password=generate_password_hash(password=password, method="pbkdf2:sha256"),
                             role=role)
             
             self.db_session.add(instance=new_user)

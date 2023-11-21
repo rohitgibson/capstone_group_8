@@ -15,7 +15,7 @@ class AuthContext:
             role = self.authVerification.checkUserCredentials(username=auth_data["username"], password=auth_data["password"])
         else:
             abort(403)
-            
+
         if role not in permitted_roles:
             abort(403)
         else:

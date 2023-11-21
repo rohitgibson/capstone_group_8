@@ -11,7 +11,6 @@ from utils.makeFuzzy import MakeFuzzy
 
 from models.api.modifyModels import AddAddress, DeleteAddress, UpdateAddress
 from models.api.searchModels import SearchAddress, SearchResults
-
 from db.redisRestore import RedisRestore
 
 class RedisConnector(RedisRestore):

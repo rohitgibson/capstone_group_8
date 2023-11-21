@@ -1,10 +1,4 @@
-from typing import Optional, Union, Any
-from typing_extensions import Annotated
 from enum import Enum
-from uuid import uuid4
-
-# from redis_om import HashModel, VectorFieldOptions, Field
-from pydantic import BaseModel, ValidationError, model_validator, field_validator, constr, Field, InstanceOf, ConfigDict
 
 class CountryEnum(str, Enum):
     US = "US"

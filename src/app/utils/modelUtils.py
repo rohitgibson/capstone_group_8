@@ -58,8 +58,6 @@ class CheckPostalCode:
             postalCode_4digit = int(postalCode[0:4])
             postalCode_5digit = int(postalCode[0:5])
 
-            print(postalCode_4digit)
-
             if postalCode_3digit in range(postalCodeRange[0], postalCodeRange[1]):
                 return True
             elif postalCode_4digit in range(postalCodeRange[0], postalCodeRange[1]):
