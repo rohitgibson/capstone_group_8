@@ -1,6 +1,6 @@
 from uuid import uuid4
 from time import sleep
-from typing import Any, Iterable
+from typing import Any
 
 import simplejson as json
 from redis import Redis, ConnectionError
@@ -130,7 +130,7 @@ class RedisConnector(RedisRestore):
         # Return a 201 status code and a success message if the address record was successfully added to Redis.
         return 201, "Address successfully added to Redis"
     
-    def bulkAddRecord(self, bulkData: Iterable[dict[str, Any]]) -> str:
+    def bulkAddRecord(self, bulkData: list[dict[str, Any]]) -> tuple[int, str]:
         """
         Processes bulk add request for mass data ingest and recovery
 
@@ -147,10 +147,13 @@ class RedisConnector(RedisRestore):
 
         # Iterate over the bulk data and call the addRecord() method for each address.
         for address in bulkData:
-            status_code, msg = self.addRecord(data=address)
+            data = {"address": address}
+            status_code, msg = self.addRecord(data=data)
 
             # Add the status code of the current bulk add operation to the list.
             all_status_codes.append(status_code)
+
+            print(msg)
 
         # If something other than a 201 status code is in the list, then some or all
         # of the bulk add operations were unsuccessful.
@@ -159,16 +162,16 @@ class RedisConnector(RedisRestore):
             # If some of the bulk add operations were successful, return a message
             # indicating that.
             if 201 in all_status_codes:
-                return "Some but not all bulk add operations were successful."
+                return 201, "Some but not all bulk add operations were successful."
             
             # Otherwise, return a message indicating that all of the bulk add operations
             # were unsuccessful.
             else:
-                return "All bulk add operations were unsuccessful."
+                return 400, "All bulk add operations were unsuccessful."
             
         # Otherwise, all of the bulk add operations were successful.
         else:
-            return "All bulk add operations were successful."
+            return 400, "All bulk add operations were successful."
             
 
     def searchData(self, data: dict[str, Any]) -> tuple[int, dict[str,Any], str]:

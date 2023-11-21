@@ -13,7 +13,7 @@ authContext = AuthContext()
 # ENDPOINT - add address
 @address_blueprint.route("/api/address/add", methods=["POST"])
 async def addAddress():
-    permitted_roles = ["admin"]
+    permitted_roles = ["root", "admin"]
     # Loads request auth headers
     authContext.authUser(permitted_roles=permitted_roles,
                          auth_data=request.authorization)
@@ -44,7 +44,7 @@ async def addAddress():
 # ENDPOINT - search address
 @address_blueprint.route("/api/address/search", methods=["GET"])
 async def searchAddress():
-    permitted_roles = ["admin", "basic"]
+    permitted_roles = ["root", "admin", "basic"]
     # Loads request auth headers
     authContext.authUser(permitted_roles=permitted_roles,
                          auth_data=request.authorization)
@@ -75,7 +75,7 @@ async def searchAddress():
 # ENDPOINT - update address
 @address_blueprint.route("/api/address/modify/update", methods=["POST"])
 async def updateAddress():
-    permitted_roles = ["admin"]
+    permitted_roles = ["root", "admin"]
     # Loads request auth headers
     authContext.authUser(permitted_roles=permitted_roles,
                          auth_data=request.authorization)
@@ -106,7 +106,7 @@ async def updateAddress():
 # ENDPOINT - delete address
 @address_blueprint.route("/api/address/modify/delete", methods=["POST"])
 async def deleteAddress():
-    permitted_roles = ["admin"]
+    permitted_roles = ["root", "admin"]
     # Loads request auth headers
     authContext.authUser(permitted_roles=permitted_roles,
                          auth_data=request.authorization)

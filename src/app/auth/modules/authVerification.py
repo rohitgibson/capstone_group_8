@@ -1,5 +1,4 @@
 from typing import Union
-from time import time
 
 from werkzeug.security import check_password_hash
 
@@ -52,5 +51,3 @@ class AuthVerification:
 
     def checkPassword(self, user_pass:str, password:str) -> bool:
         return check_password_hash(pwhash=user_pass, password=password)
-
-
