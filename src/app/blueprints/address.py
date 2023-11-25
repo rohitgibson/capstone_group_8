@@ -1,21 +1,21 @@
 from quart import Blueprint, request, Response
 
 from db.redisConnector import RedisConnector
-from auth.authContext import AuthContext
+from auth.auth import HTTPBasicAuth
 from utils.requestUtils import RequestUtils
 
 address_blueprint = Blueprint("address", __name__)
 
 redisConnector = RedisConnector()
 requestUtils = RequestUtils()
-authContext = AuthContext()
+auth = HTTPBasicAuth()
 
 # ENDPOINT - add address
 @address_blueprint.route("/api/address/add", methods=["POST"])
 async def addAddress():
     permitted_roles = ["root", "admin"]
     # Loads request auth headers
-    authContext.authUser(permitted_roles=permitted_roles,
+    auth.authUser(permitted_roles=permitted_roles,
                          auth_data=request.authorization)
     # Loads data from request
     data:bytes = await request.get_data()
@@ -46,7 +46,7 @@ async def addAddress():
 async def searchAddress():
     permitted_roles = ["root", "admin", "basic"]
     # Loads request auth headers
-    authContext.authUser(permitted_roles=permitted_roles,
+    auth.authUser(permitted_roles=permitted_roles,
                          auth_data=request.authorization)
     # Loads data from request
     data:bytes = await request.get_data()
@@ -77,7 +77,7 @@ async def searchAddress():
 async def updateAddress():
     permitted_roles = ["root", "admin"]
     # Loads request auth headers
-    authContext.authUser(permitted_roles=permitted_roles,
+    auth.authUser(permitted_roles=permitted_roles,
                          auth_data=request.authorization)
     # Loads data from request
     data:bytes = await request.get_data()
@@ -108,7 +108,7 @@ async def updateAddress():
 async def deleteAddress():
     permitted_roles = ["root", "admin"]
     # Loads request auth headers
-    authContext.authUser(permitted_roles=permitted_roles,
+    auth.authUser(permitted_roles=permitted_roles,
                          auth_data=request.authorization)
     # Loads data from request
     data:bytes = await request.get_data()

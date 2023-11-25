@@ -2,14 +2,14 @@ from quart import Blueprint, request, Response
 import pandas as pd
 
 from db.redisConnector import RedisConnector
-from auth.authContext import AuthContext
+from auth.auth import HTTPBasicAuth
 from utils.requestUtils import RequestUtils
 # from models.api.demoModels import 
 
 demo_blueprint = Blueprint("demo", __name__)
 
 redisConnector = RedisConnector()
-authContext = AuthContext()
+auth = HTTPBasicAuth()
 requestUtils = RequestUtils()
 
 # API routes for restoring database state to 
@@ -18,7 +18,7 @@ requestUtils = RequestUtils()
 async def resetDb():
     permitted_roles = ["root"]
     # Loads request auth headers
-    authContext.authUser(permitted_roles=permitted_roles,
+    auth.authUser(permitted_roles=permitted_roles,
                          auth_data=request.authorization)
     # Read data to list with Pandas
     processedData = pd.read_excel("static/project_2_addresses.xlsx").to_dict(orient="records")
@@ -34,4 +34,3 @@ async def resetDb():
                         mimetype=response_mimetype)
     # Returns response object
     return response
-

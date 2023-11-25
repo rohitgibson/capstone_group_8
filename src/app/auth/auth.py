@@ -5,14 +5,14 @@ from quart import abort
 
 from auth.modules.authVerification import AuthVerification
 
-class AuthContext:
+class HTTPBasicAuth(AuthVerification):
     def __init__(self):
-        self.authVerification = AuthVerification(current_working_dir=f"{getcwd()}/src/app/auth")
+        pass
 
     def authUser(self, permitted_roles:list[str], auth_data):
         if auth_data is not None:
             auth_data = dict(auth_data)
-            role = self.authVerification.checkUserCredentials(username=auth_data["username"], password=auth_data["password"])
+            role = self.checkUserCredentials(username=auth_data["username"], password=auth_data["password"])
         else:
             abort(403)
 

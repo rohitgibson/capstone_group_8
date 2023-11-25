@@ -1,12 +1,12 @@
 from quart import Blueprint, request, Response
 
 from utils.requestUtils import RequestUtils
-from auth.authContext import AuthContext
+from auth.auth import HTTPBasicAuth
 from models.api.userModels import UserCheck, Update, Delete
 
 user_blueprint = Blueprint("user", __name__)
 
-authContext = AuthContext()
+auth = HTTPBasicAuth()
 requestUtils = RequestUtils()
 
 # ENDPOINT -- ADD AUTH USER
@@ -14,16 +14,16 @@ requestUtils = RequestUtils()
 async def addUsers():
     permitted_roles = ["root"]
     # Loads request auth headers
-    authContext.authUser(permitted_roles=permitted_roles,
+    auth.authUser(permitted_roles=permitted_roles,
                          auth_data=request.authorization)
     # Loads data from request
     data:bytes = await request.get_data()
     # Converts data to Python dictionary
     processedData = UserCheck(**requestUtils.processRequestData(data=data, origin="user_add")).model_dump(mode="JSON")
     # Adds data to Users table in auth db
-    authContext.authVerification.authConnection.usersTableCreate(username=processedData["username"],
-                                                                 password=processedData["password"],
-                                                                 role=processedData["role"])
+    auth.authConnection.usersTableCreate(username=processedData["username"],
+                                                  password=processedData["password"],
+                                                  role=processedData["role"])
     # Sets response data mimetype
     response_mimetype = "application/json"
     # Sets response HTTP status code
@@ -38,15 +38,15 @@ async def addUsers():
 async def updateUsers():
     permitted_roles = ["root"]
     # Loads request auth headers
-    authContext.authUser(permitted_roles=permitted_roles,
+    auth.authUser(permitted_roles=permitted_roles,
                          auth_data=request.authorization)
     # Loads data from request
     data:bytes = await request.get_data()
     # Converts data to Python dictionary
     processedData = Update(**requestUtils.processRequestData(data=data, origin="user_add")).model_dump(mode="JSON")
     # Adds data to Users table in auth db
-    authContext.authVerification.authConnection.usersTableUpdate(username=processedData["username"],
-                                                                 changes=processedData["changes"])
+    auth.authConnection.usersTableUpdate(username=processedData["username"],
+                                         changes=processedData["changes"])
     # Sets response data mimetype
     response_mimetype = "application/json"
     # Sets response HTTP status code
@@ -61,14 +61,14 @@ async def updateUsers():
 async def deleteUsers():
     permitted_roles = ["root"]
     # Loads request auth headers
-    authContext.authUser(permitted_roles=permitted_roles,
+    auth.authUser(permitted_roles=permitted_roles,
                          auth_data=request.authorization)
     # Loads data from request
     data:bytes = await request.get_data()
     # Converts data to Python dictionary
     processedData = Delete(**requestUtils.processRequestData(data=data, origin="user_add")).model_dump(mode="JSON")
     # Adds data to Users table in auth db
-    authContext.authVerification.authConnection.usersTableDelete(username=processedData["username"])
+    auth.authConnection.usersTableDelete(username=processedData["username"])
     # Sets response data mimetype
     response_mimetype = "application/json"
     # Sets response HTTP status code

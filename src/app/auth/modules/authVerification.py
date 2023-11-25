@@ -5,8 +5,8 @@ from werkzeug.security import check_password_hash
 from auth.modules.authConnection import AuthConnection
 
 class AuthVerification:
-    def __init__(self, current_working_dir:str):
-        self.authConnection = AuthConnection(current_working_dir=current_working_dir)
+    def __init__(self):
+        self.authConnection = AuthConnection()
         self.prev_authd_users = [{}]
 
     def checkUserCredentials(self, username:str, password:str) -> Union[str, None]:

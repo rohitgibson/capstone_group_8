@@ -340,13 +340,23 @@ class RedisConnector(RedisRestore):
             self.conn.json().delete(key=f"{key}",
                                     path="$")
         except ConnectionError as e:
-            self.conn_alive = False
             return 500, f"Database connection error: {e}. Please try again later."
         except Exception as e:
             return 500, f"Miscellaneous server error: {e}. Please try again later."
 
 
         return 200, f"Successfully deleted {key}"
+    
+    def deleteAllRecords(self) -> tuple[int, str]:
+        try:
+            self.conn.flushall()
+        except ConnectionError as e:
+            return 500, f"Database connection error: {e}. Please try again later."
+        except Exception as e:
+            return 500, f"Miscellaneous server error: {e}. Please try again later."
+
+
+        return 200, f"Successfully deleted all records."
 
 
 

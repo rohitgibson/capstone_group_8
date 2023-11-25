@@ -55,16 +55,16 @@ class CheckPostalCode:
             postalCode_4digit = int(postalCode[0:4])
             postalCode_5digit = int(postalCode[0:5])
 
-            if postalCode_3digit in range(postalCodeRange[0], postalCodeRange[1]):
+            if True in list(map(lambda postalCodeRange: self.mapZipRangeValid(postalCodeRange=postalCodeRange, postalCodeSubset=postalCode_3digit), postalCodeRange)):
                 return True
-            elif postalCode_4digit in range(postalCodeRange[0], postalCodeRange[1]):
+            elif True in list(map(lambda postalCodeRange: self.mapZipRangeValid(postalCodeRange=postalCodeRange, postalCodeSubset=postalCode_4digit), postalCodeRange)):
                 return True
-            elif postalCode_5digit in range(postalCodeRange[0], postalCodeRange[1]):
+            elif True in list(map(lambda postalCodeRange: self.mapZipRangeValid(postalCodeRange=postalCodeRange, postalCodeSubset=postalCode_5digit), postalCodeRange)):
                 return True
             else: 
                 return False
             
-        elif country == "ca" and 6 <= len(postalCode) <= 7:
+        elif country == "CA":
             postalCode_1char = postalCode[0]
 
             if postalCode_1char in postalCodeRange:
@@ -75,5 +75,5 @@ class CheckPostalCode:
         else: 
             return False
 
-
-
+    def mapZipRangeValid(self, postalCodeRange: tuple[int, int], postalCodeSubset:str) -> bool:
+        return postalCodeSubset in range(postalCodeRange[0], postalCodeRange[1])

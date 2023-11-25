@@ -11,7 +11,7 @@ from utils.miscUtils import MiscUtils
 
 class AuthConnection:
     # Begin Connection Init Workflow
-    def __init__(self, current_working_dir:str):
+    def __init__(self):
         """ 
         Creates and initializes connection with the auth credentials database.
         
