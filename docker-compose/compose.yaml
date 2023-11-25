@@ -13,8 +13,7 @@ name: group_8_capstone
 services:
   server:
     container_name: "group_8_avs_api"
-    build:
-      context: .
+    image: ghcr.io/rohitgibson/capstone_group_8:main
     ports:
       - 8000:8000
     networks:
@@ -39,7 +38,7 @@ services:
     entrypoint:
       - /usr/share/grafana/bin/grafana-server
       - --homepath=/usr/share/grafana
-      - --config=./grafana/config
+      - --config=/etc/grafana-config/grafana.ini
     volumes:
       - ./grafana/config:/etc/grafana-config
       - ./grafana/datasources:/etc/grafana/provisioning/datasources
@@ -49,13 +48,6 @@ services:
       - "3000:3000"
     networks:
       - avs_network
-
-  healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost"]
-      interval: 1m30s
-      timeout: 10s
-      retries: 3
-      start_period: 2m
 
 networks:
   avs_network:
