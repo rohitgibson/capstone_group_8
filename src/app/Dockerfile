@@ -14,7 +14,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # the application crashes without emitting any logs due to buffering.
 ENV PYTHONUNBUFFERED=1
 
-WORKDIR /Users/rohitgibson/Documents/GitHub/capstone_experiments/src/app
+# WORKDIR /Users/rohitgibson/Documents/GitHub/capstone_experiments/src/app
 
 # Create a non-privileged user that the app will run under.
 # See https://docs.docker.com/develop/develop-images/dockerfile_best-practices/#user
@@ -46,4 +46,4 @@ COPY . .
 EXPOSE 8000
 
 # Run the application.
-CMD uvicorn app:app --host=0.0.0.0 --port=8000
+CMD uvicorn capstone_group_8.src.app:app --host=0.0.0.0 --port=8000

@@ -14,6 +14,8 @@ services:
   server:
     container_name: "group_8_avs_api"
     image: ghcr.io/rohitgibson/capstone_group_8:main
+    build: 
+      context: .
     ports:
       - 8000:8000
     networks:
