@@ -52,14 +52,16 @@ class Address(BaseModel):
             # function to verify that the `postalCode` field is
             # valid for the given `stateProv` field
 
-            if checkPostalCode.postalCodeVerification(country=country, stateProv=stateProv, postalCode=postalCode) is True:
-                # If the `postalCode` field is valid, return the
-                # `Address` object.
-                return self
-            else:
-                # If the `postalCode` field is not valid, 
-                # raise a `ValueError` exception.
-                raise ValueError(f'postalCode "{postalCode}" incompatible with stateProv value "{stateProv}" and country value "{country}"')
+            # if checkPostalCode.postalCodeVerification(country=country, stateProv=stateProv, postalCode=postalCode) is True:
+            #     # If the `postalCode` field is valid, return the
+            #     # `Address` object.
+            #     return self
+            # else:
+            #     # If the `postalCode` field is not valid, 
+            #     # raise a `ValueError` exception.
+            #     raise ValueError(f'postalCode "{postalCode}" incompatible with stateProv value "{stateProv}" and country value "{country}"')
+
+            return self
             
         else:
             # If the `country` and `stateProv` fields are

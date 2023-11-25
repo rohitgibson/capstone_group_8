@@ -7,7 +7,7 @@ from auth.modules.authConnection import AuthConnection
 class AuthVerification:
     def __init__(self):
         self.authConnection = AuthConnection()
-        self.prev_authd_users = [{}]
+        self.prev_authd_users = [{"username":"username"}]
 
     def checkUserCredentials(self, username:str, password:str) -> Union[str, None]:
         """ 
@@ -30,10 +30,15 @@ class AuthVerification:
             return None
     
     def checkAuthdUsers(self, username:str) -> Union[tuple[str, str], tuple[None, None]]:
+        if self.prev_authd_users == [{}]:
+            return None, None
+        else:
+            pass
+
         try:
             filter_prev_authd_users = list(filter(lambda user: user["username"] == username, self.prev_authd_users))
         except Exception as e:
-            print(e)
+            print("Breakpoint 1", e)
             return None, None
 
         if filter_prev_authd_users != []:

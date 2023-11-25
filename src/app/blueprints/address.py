@@ -1,3 +1,5 @@
+from base64 import b64decode
+
 from quart import Blueprint, request, Response
 
 from db.redisConnector import RedisConnector
@@ -16,7 +18,7 @@ async def addAddress():
     permitted_roles = ["root", "admin"]
     # Loads request auth headers
     auth.authUser(permitted_roles=permitted_roles,
-                         auth_data=request.authorization)
+                  auth_data=rf"{request.authorization}")
     # Loads data from request
     data:bytes = await request.get_data()
     # Converts data to Python dictionary
@@ -47,7 +49,7 @@ async def searchAddress():
     permitted_roles = ["root", "admin", "basic"]
     # Loads request auth headers
     auth.authUser(permitted_roles=permitted_roles,
-                         auth_data=request.authorization)
+                  auth_data=rf"{request.authorization}")
     # Loads data from request
     data:bytes = await request.get_data()
     # Loads data from request
@@ -78,7 +80,7 @@ async def updateAddress():
     permitted_roles = ["root", "admin"]
     # Loads request auth headers
     auth.authUser(permitted_roles=permitted_roles,
-                         auth_data=request.authorization)
+                  auth_data=rf"{request.authorization}")
     # Loads data from request
     data:bytes = await request.get_data()
     # Loads data from request
@@ -109,7 +111,7 @@ async def deleteAddress():
     permitted_roles = ["root", "admin"]
     # Loads request auth headers
     auth.authUser(permitted_roles=permitted_roles,
-                         auth_data=request.authorization)
+                  auth_data=rf"{request.authorization}")
     # Loads data from request
     data:bytes = await request.get_data()
     # Loads data from request

@@ -21,7 +21,7 @@ class RedisConnector(RedisRestore):
 
     def __init__(self):        
         # Establishes Redis connection for all subsequent requests
-        self.conn = Redis(decode_responses=True)
+        self.conn = Redis(host="redis", port="6379", decode_responses=True)
 
         # Attempts to create a search index
         self.createIndex()
