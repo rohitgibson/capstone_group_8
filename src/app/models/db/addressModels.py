@@ -1,7 +1,5 @@
 from typing import Optional, Union, Any
-from typing_extensions import Annotated
-from enum import Enum
-from uuid import uuid4
+from re import fullmatch
 
 # from redis_om import HashModel, VectorFieldOptions, Field
 from pydantic import BaseModel, ValidationError, model_validator, field_validator, constr, Field, InstanceOf, ConfigDict
@@ -49,13 +47,12 @@ class Address(BaseModel):
         # the `stateProv` field is of type `StateEnum`, or if
         # the `country` field is equal to "CA" and the `stateProv`
         # field is of type `ProvEnum`.
-        if country == "US" and type(stateProv) == StateEnum or country == "CA" and type(stateProv) == ProvEnum:
+        if country == "US" and type(stateProv) == StateEnum and fullmatch(checkPostalCode.postalCodeRegexUS, postalCode) is not None or country == "CA" and type(stateProv) == ProvEnum and fullmatch(checkPostalCode.postalCodeRegexCA, postalCode) is not None:
             # Call the `checkPostalCode.postalCodeVerification()`
             # function to verify that the `postalCode` field is
             # valid for the given `stateProv` field
-            postalCodeValid:bool = checkPostalCode.postalCodeVerification(stateProv=stateProv, postalCode=postalCode)
 
-            if postalCodeValid is True:
+            if checkPostalCode.postalCodeVerification(country=country, stateProv=stateProv, postalCode=postalCode) is True:
                 # If the `postalCode` field is valid, return the
                 # `Address` object.
                 return self
@@ -67,4 +64,4 @@ class Address(BaseModel):
         else:
             # If the `country` and `stateProv` fields are
             # not compatible, raise a `ValueError` exception.
-            raise ValueError(f'stateProv value "{stateProv}" incompatible with country value "{country}"')
+            raise ValueError(f'stateProv value "{stateProv}" and/or postalCode "{postalCode}" value is incompatible with country value "{country}"')

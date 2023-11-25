@@ -14,7 +14,7 @@ class AddAddress(BaseModel):
     address: Union[Address, list[Address]]
 
 class UpdateAddress(BaseModel):
-    key: str    
+    key: str
     address: Address
 
     @field_validator('key')
