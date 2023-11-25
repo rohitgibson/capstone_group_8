@@ -36,16 +36,7 @@ services:
 
   grafana:
     container_name: grafana-dashboards
-    image: grafana/grafana:10.0.3
-    entrypoint:
-      - /usr/share/grafana/bin/grafana-server
-      - --homepath=/usr/share/grafana
-      - --config=/etc/grafana-config/grafana.ini
-    volumes:
-      - ./grafana/config:/etc/grafana-config
-      - ./grafana/datasources:/etc/grafana/provisioning/datasources
-      - ./grafana/dashboards-provisioning:/etc/grafana/provisioning/dashboards
-      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    image: grafana/grafana-oss:latest
     ports:
       - "3000:3000"
     networks:
