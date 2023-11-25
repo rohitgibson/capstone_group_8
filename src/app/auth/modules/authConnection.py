@@ -25,7 +25,7 @@ class AuthConnection:
         """
         
         # Sets current working directory
-        self.cwd = current_working_dir
+        self.cwd = "./auth"
 
         # Initializes MiscUtils for path creation
         self.miscUtils = MiscUtils()

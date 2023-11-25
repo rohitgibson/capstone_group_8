@@ -21,7 +21,7 @@ class Address(BaseModel):
     city: str 
     stateProv: Union[StateEnum, ProvEnum] 
     postalCode: str 
-    country: CountryEnum 
+    country: CountryEnum
 
     @model_validator(mode='after')
     def check_stateProv_valid(self) -> 'Address':
