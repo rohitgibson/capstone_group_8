@@ -6,7 +6,7 @@ from blueprints.address import address_blueprint
 from blueprints.users import user_blueprint
 from blueprints.demo import demo_blueprint
 
-logging.basicConfig(filename="./logs/log.txt", level=logging.DEBUG)
+logging.basicConfig(filename="./logs/avs.log", level=logging.DEBUG)
 
 app = Quart(__name__)
 
