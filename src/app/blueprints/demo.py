@@ -19,7 +19,9 @@ async def resetDb():
     permitted_roles = ["root"]
     # Loads request auth headers
     auth.authUser(permitted_roles=permitted_roles,
-                         auth_data=request.authorization)
+                  auth_data=rf"{request.authorization}")
+    # Wipes all data currently in Redis
+    deleteRecordResponseCode, deleteRecordResponseMsg = redisConnector.deleteAllRecords()
     # Read data to list with Pandas
     processedData = pd.read_excel("static/project_2_addresses.xlsx").to_dict(orient="records")
     # Adds data to Redis db

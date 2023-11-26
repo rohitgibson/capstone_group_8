@@ -15,7 +15,7 @@ async def addUsers():
     permitted_roles = ["root"]
     # Loads request auth headers
     auth.authUser(permitted_roles=permitted_roles,
-                         auth_data=request.authorization)
+                  auth_data=rf"{request.authorization}")
     # Loads data from request
     data:bytes = await request.get_data()
     # Converts data to Python dictionary
@@ -39,7 +39,7 @@ async def updateUsers():
     permitted_roles = ["root"]
     # Loads request auth headers
     auth.authUser(permitted_roles=permitted_roles,
-                         auth_data=request.authorization)
+                  auth_data=rf"{request.authorization}")
     # Loads data from request
     data:bytes = await request.get_data()
     # Converts data to Python dictionary
@@ -62,7 +62,7 @@ async def deleteUsers():
     permitted_roles = ["root"]
     # Loads request auth headers
     auth.authUser(permitted_roles=permitted_roles,
-                         auth_data=request.authorization)
+                  auth_data=rf"{request.authorization}")
     # Loads data from request
     data:bytes = await request.get_data()
     # Converts data to Python dictionary
