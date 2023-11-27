@@ -46,4 +46,5 @@ COPY . .
 EXPOSE 8000
 
 # Run the application.
-CMD uvicorn app:app --app-dir src/app --host=0.0.0.0 --port=8000
+# ENV HOST_IP=host.docker.internal:host-gateway
+CMD python3 src/app/app.py

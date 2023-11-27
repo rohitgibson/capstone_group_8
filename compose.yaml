@@ -1,17 +1,27 @@
+# Comments are provided throughout this file to help you get started.
+# If you need more help, visit the Docker compose reference guide at
+# https://docs.docker.com/compose/compose-file/
+
+# Here the instructions define your application as a service called "server".
+# This service is built from the Dockerfile in the current directory.
+# You can add other services your application may depend on here, such as a
+# database or a cache. For examples, see the Awesome Compose repository:
+# https://github.com/docker/awesome-compose
+
 version: '3'
 name: group_8_capstone
 services:
+
   server:
     container_name: "group_8_avs_api"
-    image: ghcr.io/rohitgibson/capstone_group_8:main
+    # image: "ghcr.io/rohitgibson/capstone_group_8:main"
     build: 
       context: .
-    depends_on:
-      - redis
     ports:
-      - 8000:8000
+      - 80:80
     networks:
-      - avs_network
+      - avs_internal
+      # - avs_external
 
   redis:
     image: "redis/redis-stack:latest"
@@ -24,36 +34,18 @@ services:
     environment:
       - "REDIS_ARGS=--enable-debug-command yes --enable-module-command yes"
     networks:
-      - avs_network
-
-  grafana:
-    container_name: grafana-dashboards
-    image: grafana/grafana-oss:latest
-    ports:
-      - "3000:3000"
-    networks:
-      - grafana_network
-
-  loki:
-    image: grafana/loki:2.9.2
-    expose:
-      - "3100:3100"
-    command: -config.file=/etc/loki/local-config.yaml
-    networks:
-      - grafana_network
-
-  promtail:
-    image: grafana/promtail:2.9.2
-    volumes:
-      - /var/log:/var/log
-    command: -config.file=/etc/promtail/config.yml
-    networks:
-      - grafana_network
-
+      - avs_internal
+  
 networks:
-  avs_network:
+  avs_external:
     driver: bridge
-    name: avs_network
-  grafana_network:
+    driver_opts:
+      gateway: 172.17.0.1
+    name: avs_external
+
+  avs_internal:
     driver: bridge
-    name: grafana_network
+    name: avs_internal
+    driver_opts:
+      gateway: 172.17.0.1
+

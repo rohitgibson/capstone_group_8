@@ -155,6 +155,9 @@ class RedisConnector(RedisRestore):
 
             print(msg)
 
+        # Attempts to create a search index
+        self.createIndex()
+
         # If something other than a 201 status code is in the list, then some or all
         # of the bulk add operations were unsuccessful.
         if not 201 in all_status_codes:
@@ -350,6 +353,7 @@ class RedisConnector(RedisRestore):
     def deleteAllRecords(self) -> tuple[int, str]:
         try:
             self.conn.flushall()
+            self.createIndex()
         except ConnectionError as e:
             return 500, f"Database connection error: {e}. Please try again later."
         except Exception as e:

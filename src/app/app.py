@@ -1,6 +1,8 @@
 import logging
+import socket
 
 from quart import Quart
+import uvicorn
 
 from blueprints.address import address_blueprint
 from blueprints.users import user_blueprint
@@ -15,6 +17,8 @@ app.register_blueprint(user_blueprint)
 app.register_blueprint(demo_blueprint)
 
 print(app.url_map)
+
+uvicorn.run(app=app, host=socket.gethostbyname(socket.gethostname()), port=80)
 
 
 

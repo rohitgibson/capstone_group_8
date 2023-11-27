@@ -26,7 +26,6 @@ async def resetDb():
     processedData = pd.read_excel("static/project_2_addresses.xlsx").to_dict(orient="records")
     # Adds data to Redis db
     addRecordResponseCode, addRecordResponseMsg = redisConnector.bulkAddRecord(bulkData=processedData)
-    print(addRecordResponseMsg)
     # Sets response data mimetype
     response_mimetype = "application/json"
     # Sets response HTTP status code
