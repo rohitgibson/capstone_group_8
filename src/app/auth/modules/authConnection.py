@@ -6,7 +6,7 @@ from sqlalchemy import create_engine, select, update, delete
 from sqlalchemy.orm import Session
 from werkzeug.security import generate_password_hash
 
-from models.db.authModels import Role, RoleCheck, User, UserCheck, Base
+from models.db.authModels import Role, RoleCheck, User, UserCheck, UserUpdate, UserDelete, Base
 from utils.miscUtils import MiscUtils
 
 class AuthConnection:
@@ -115,8 +115,8 @@ class AuthConnection:
         return results
 
     def usersTableUpdate(self, username:str, changes:dict[str, Any]) -> None:
-        print(username, changes)
         try:
+            UserUpdate.model_validate({"username":username,"changes":changes})
             update_statement = update(User).where(User.username == username).values(username=changes['username'],
                                                                                     password=generate_password_hash(password=changes["password"]),
                                                                                     role=changes["role"])
@@ -128,8 +128,8 @@ class AuthConnection:
             self.resetSession()        
 
     def usersTableDelete(self, username:str):
-        print(username)
         try:
+            UserDelete.model_validate({"username":username})
             delete_statement = delete(User).where(User.username == username)
             print(delete_statement)
             self.db_session.execute(delete_statement)

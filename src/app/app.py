@@ -18,7 +18,7 @@ app.register_blueprint(demo_blueprint)
 
 print(app.url_map)
 
-uvicorn.run(app=app, host=socket.gethostbyname(socket.gethostname()), port=80)
+uvicorn.run(app=app, host=socket.gethostbyname(socket.gethostname()), port=8000)
 
 
 

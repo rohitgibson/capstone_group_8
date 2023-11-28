@@ -1,27 +1,19 @@
-# Comments are provided throughout this file to help you get started.
-# If you need more help, visit the Docker compose reference guide at
-# https://docs.docker.com/compose/compose-file/
-
-# Here the instructions define your application as a service called "server".
-# This service is built from the Dockerfile in the current directory.
-# You can add other services your application may depend on here, such as a
-# database or a cache. For examples, see the Awesome Compose repository:
-# https://github.com/docker/awesome-compose
-
 version: '3'
 name: group_8_capstone
 services:
 
   server:
     container_name: "group_8_avs_api"
-    # image: "ghcr.io/rohitgibson/capstone_group_8:main"
+    image: "ghcr.io/rohitgibson/capstone_group_8:main"
     build: 
       context: .
     ports:
       - 80:80
     networks:
       - avs_internal
-      # - avs_external
+    depends_on:
+      - redis
+    restart: on-failure
 
   redis:
     image: "redis/redis-stack:latest"
@@ -35,14 +27,20 @@ services:
       - "REDIS_ARGS=--enable-debug-command yes --enable-module-command yes"
     networks:
       - avs_internal
+    restart: on-failure
+
+  nginx:
+    image: "nginx"
+    container_name: nginx
+    ports:
+      - 80:80
+    depends_on:
+      - server
+    restart: on-failure
+
+    
   
 networks:
-  avs_external:
-    driver: bridge
-    driver_opts:
-      gateway: 172.17.0.1
-    name: avs_external
-
   avs_internal:
     driver: bridge
     name: avs_internal

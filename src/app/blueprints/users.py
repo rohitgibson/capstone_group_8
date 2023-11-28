@@ -43,10 +43,10 @@ async def updateUsers():
     # Loads data from request
     data:bytes = await request.get_data()
     # Converts data to Python dictionary
-    processedData = Update(**requestUtils.processRequestData(data=data, origin="user_add")).model_dump(mode="JSON")
+    processedData = Update(**requestUtils.processRequestData(data=data, origin="user_update")).model_dump(mode="JSON")
     # Adds data to Users table in auth db
-    auth.authConnection.usersTableUpdate(username=processedData["username"],
-                                         changes=processedData["changes"])
+    auth.authVerification.authConnection.usersTableUpdate(username=processedData["username"],
+                                                          changes=processedData["changes"])
     # Sets response data mimetype
     response_mimetype = "application/json"
     # Sets response HTTP status code
@@ -66,9 +66,9 @@ async def deleteUsers():
     # Loads data from request
     data:bytes = await request.get_data()
     # Converts data to Python dictionary
-    processedData = Delete(**requestUtils.processRequestData(data=data, origin="user_add")).model_dump(mode="JSON")
+    processedData = Delete(**requestUtils.processRequestData(data=data, origin="user_delete")).model_dump(mode="JSON")
     # Adds data to Users table in auth db
-    auth.authConnection.usersTableDelete(username=processedData["username"])
+    auth.authVerification.authConnection.usersTableDelete(username=processedData["username"])
     # Sets response data mimetype
     response_mimetype = "application/json"
     # Sets response HTTP status code

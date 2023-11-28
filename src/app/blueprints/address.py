@@ -13,7 +13,7 @@ requestUtils = RequestUtils()
 auth = HTTPBasicAuth()
 
 # ENDPOINT - add address
-@address_blueprint.route("/api/address/add", methods=["POST"])
+@address_blueprint.route("/api/address/modify/add", methods=["POST"])
 async def addAddress():
     permitted_roles = ["root", "admin"]
     # Loads request auth headers
