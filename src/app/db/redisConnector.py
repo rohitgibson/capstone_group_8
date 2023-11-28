@@ -21,7 +21,7 @@ class RedisConnector(RedisRestore):
 
     def __init__(self):        
         # Establishes Redis connection for all subsequent requests
-        self.conn = Redis(host="redis", port="6379", decode_responses=True)
+        self.conn = Redis(host="localhost", port="6379", decode_responses=True)
 
         # Attempts to create a search index
         self.createIndex()
@@ -284,7 +284,7 @@ class RedisConnector(RedisRestore):
 
         # Performs model validation check on inbound data
         try:
-            updateAddress = UpdateAddress(**data).model_dump()["address"]
+            updateAddress = UpdateAddress(**data).model_dump()
         except ValidationError as e:
             return 400, f"Update validation failed: {e}"
         except Exception as e: 
@@ -300,10 +300,10 @@ class RedisConnector(RedisRestore):
 
         # Key update logic
         try:
-            data = updateAddress["data"]
+            address = updateAddress["address"]
             self.conn.json().set(name=f"{key}",
                                  path="$",
-                                 obj=data)
+                                 obj=address)
         except ConnectionError as e:
             return 500, f"Database connection error: {e}. Please try again later."
         except Exception as e:

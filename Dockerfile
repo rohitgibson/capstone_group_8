@@ -47,4 +47,4 @@ EXPOSE 80
 
 # Run the application.
 # ENV HOST_IP=host.docker.internal:host-gateway
-CMD python3 src/app/app.py
+CMD uvicorn app:app --app-dir src/app --host 0.0.0.0 --port 8000

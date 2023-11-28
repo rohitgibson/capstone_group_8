@@ -20,7 +20,7 @@ class Address(BaseModel):
     addressLine2: Optional[str] = Field(default="")
     city: str 
     stateProv: Union[StateEnum, ProvEnum] 
-    postalCode: str 
+    postalCode: str
     country: CountryEnum
 
     @model_validator(mode='after')
@@ -41,29 +41,32 @@ class Address(BaseModel):
         """
         stateProv = self.stateProv
         country = self.country
-        postalCode = self.postalCode
+        self.postalCode = self.postalCode.replace(" ", "")
 
         # Check if the `country` field is equal to "US" and 
         # the `stateProv` field is of type `StateEnum`, or if
         # the `country` field is equal to "CA" and the `stateProv`
         # field is of type `ProvEnum`.
-        if country == "US" and type(stateProv) == StateEnum and fullmatch(checkPostalCode.postalCodeRegexUS, postalCode) is not None or country == "CA" and type(stateProv) == ProvEnum and fullmatch(checkPostalCode.postalCodeRegexCA, postalCode) is not None:
+        if country == "US" and type(stateProv) == StateEnum and fullmatch(checkPostalCode.postalCodeRegexUS, self.postalCode) is not None or country == "CA" and type(stateProv) == ProvEnum and fullmatch(checkPostalCode.postalCodeRegexCA, self.postalCode) is not None:
             # Call the `checkPostalCode.postalCodeVerification()`
             # function to verify that the `postalCode` field is
             # valid for the given `stateProv` field
 
-            # if checkPostalCode.postalCodeVerification(country=country, stateProv=stateProv, postalCode=postalCode) is True:
-            #     # If the `postalCode` field is valid, return the
-            #     # `Address` object.
-            #     return self
-            # else:
-            #     # If the `postalCode` field is not valid, 
-            #     # raise a `ValueError` exception.
-            #     raise ValueError(f'postalCode "{postalCode}" incompatible with stateProv value "{stateProv}" and country value "{country}"')
+            # if country == "CA":
+            if checkPostalCode.postalCodeVerification(country=country, stateProv=stateProv, postalCode=self.postalCode) is True:
+                    # If the `postalCode` field is valid, return the
+                    # `Address` object.
+                return self
+            else:
+                raise ValueError(f'postalCode "{self.postalCode}" incompatible with stateProv value "{stateProv}" and country value "{country}"')
 
-            return self
+            # US ZIP codes aren't validated against stateProv because
+            # they're a logical disaster. It's near impossible to find
+            # an authoritative online source for ZIP code blocks assigned
+            # to individual states.
+            # return self
             
         else:
             # If the `country` and `stateProv` fields are
             # not compatible, raise a `ValueError` exception.
-            raise ValueError(f'stateProv value "{stateProv}" and/or postalCode "{postalCode}" value is incompatible with country value "{country}"')
+            raise ValueError(f'stateProv value "{stateProv}" and/or postalCode "{self.postalCode}" value is incompatible with country value "{country}"')
