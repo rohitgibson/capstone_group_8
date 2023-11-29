@@ -26,7 +26,7 @@ async def addAddress():
     # Adds data to Redis db
     addRecordResponseCode, addRecordResponseMsg = redisConnector.addRecord(data=processedData)
     # Sets response data
-    response_data = requestUtils.processResponse(requestType="add",
+    response_data = requestUtils.processResponse(requestType="add_address",
                                                  requestData=processedData,
                                                  responseCode=addRecordResponseCode,
                                                  responseMsg=addRecordResponseMsg,
@@ -53,11 +53,11 @@ async def searchAddress():
     # Loads data from request
     data:bytes = await request.get_data()
     # Loads data from request
-    processedData = requestUtils.processRequestData(data=data, origin="search")
+    processedData = requestUtils.processRequestData(data=data, origin="search_address")
     # Sends search query to Redis
     searchDataResponseCode, searchDataResponseData, searchRequestMsg = redisConnector.searchData(data=processedData)
     # Sets response data
-    response_data = requestUtils.processResponse(requestType="search",
+    response_data = requestUtils.processResponse(requestType="search_address",
                                                  requestData=processedData,
                                                  responseCode=searchDataResponseCode,
                                                  responseMsg=searchRequestMsg,
@@ -84,11 +84,11 @@ async def updateAddress():
     # Loads data from request
     data:bytes = await request.get_data()
     # Loads data from request
-    processedData = requestUtils.processRequestData(data=data, origin="update")
+    processedData = requestUtils.processRequestData(data=data, origin="update_address")
     # Updates data in Redis
     updateRecordResponseCode, updateRecordResponseMsg = redisConnector.updateRecord(data=processedData)
     # Sets response data
-    response_data = requestUtils.processResponse(requestType="update",
+    response_data = requestUtils.processResponse(requestType="update_address",
                                                  requestData=processedData,
                                                  responseCode=updateRecordResponseCode,
                                                  responseMsg=updateRecordResponseMsg,
@@ -115,11 +115,11 @@ async def deleteAddress():
     # Loads data from request
     data:bytes = await request.get_data()
     # Loads data from request
-    processedData = requestUtils.processRequestData(data=data, origin="delete")
+    processedData = requestUtils.processRequestData(data=data, origin="delete_address")
     # Deletes data in Redis
     deleteRecordResponseCode, deleteRecordResponseMsg = redisConnector.deleteRecord(data=processedData)
     # Sets response data
-    response_data = requestUtils.processResponse(requestType="delete",
+    response_data = requestUtils.processResponse(requestType="delete_address",
                                                  requestData=processedData,
                                                  responseCode=deleteRecordResponseCode,
                                                  responseMsg=deleteRecordResponseMsg,

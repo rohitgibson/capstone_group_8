@@ -1,4 +1,5 @@
 from typing import Union, Any
+from datetime import datetime as dt
 
 import simplejson as json
 from pydantic import ValidationError
@@ -100,6 +101,7 @@ class RequestUtils:
             "requestType": requestType,
             "requestData": requestData,
             "requestSuccess": requestSuccess,
+            "responseTimestamp": dt.utcnow(),
             "responseStatusMsg": responseMsg,
             "responseData": responseData
         }

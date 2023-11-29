@@ -2,7 +2,7 @@ from quart import Blueprint, request, Response
 
 from utils.requestUtils import RequestUtils
 from auth.auth import HTTPBasicAuth
-from models.api.userModels import UserCheck, Update, Delete
+from models.db.authModels import UserCheck, UserUpdate, UserDelete
 
 user_blueprint = Blueprint("user", __name__)
 
@@ -19,17 +19,22 @@ async def addUsers():
     # Loads data from request
     data:bytes = await request.get_data()
     # Converts data to Python dictionary
-    processedData = UserCheck(**requestUtils.processRequestData(data=data, origin="user_add")).model_dump(mode="JSON")
+    processedData = requestUtils.processRequestData(data=data, origin="add_user")
     # Adds data to Users table in auth db
-    auth.authConnection.usersTableCreate(username=processedData["username"],
-                                                  password=processedData["password"],
-                                                  role=processedData["role"])
+    response_status_code, response_data, response_msg = auth.authVerification.authConnection.usersTableCreate(data=processedData)
+    # Sets response data
+    response_data = requestUtils.processResponse(requestType="add_user",
+                                                 requestData=processedData,
+                                                 responseCode=response_status_code,
+                                                 responseMsg=response_msg,
+                                                 responseData=None)
     # Sets response data mimetype
     response_mimetype = "application/json"
     # Sets response HTTP status code
-    response_status_code = 201
+    response_status_code = response_status_code
     # Creates response object
-    response = Response(status=response_status_code,
+    response = Response(response=response_data,
+                        status=response_status_code,
                         mimetype=response_mimetype)
     # Returns response object
     return response
@@ -43,16 +48,20 @@ async def updateUsers():
     # Loads data from request
     data:bytes = await request.get_data()
     # Converts data to Python dictionary
-    processedData = Update(**requestUtils.processRequestData(data=data, origin="user_update")).model_dump(mode="JSON")
-    # Adds data to Users table in auth db
-    auth.authVerification.authConnection.usersTableUpdate(username=processedData["username"],
-                                                          changes=processedData["changes"])
+    processedData = requestUtils.processRequestData(data=data, origin="update_user")
+    # Updates data in Users table in auth db
+    response_status_code, response_data, response_msg = auth.authVerification.authConnection.usersTableUpdate(data=processedData)
+    # Sets response data
+    response_data = requestUtils.processResponse(requestType="update_user",
+                                                 requestData=processedData,
+                                                 responseCode=response_status_code,
+                                                 responseMsg=response_msg,
+                                                 responseData=None)
     # Sets response data mimetype
     response_mimetype = "application/json"
-    # Sets response HTTP status code
-    response_status_code = 201
     # Creates response object
-    response = Response(status=response_status_code,
+    response = Response(response=response_data,
+                        status=response_status_code,
                         mimetype=response_mimetype)
     # Returns response object
     return response
@@ -66,15 +75,20 @@ async def deleteUsers():
     # Loads data from request
     data:bytes = await request.get_data()
     # Converts data to Python dictionary
-    processedData = Delete(**requestUtils.processRequestData(data=data, origin="user_delete")).model_dump(mode="JSON")
-    # Adds data to Users table in auth db
-    auth.authVerification.authConnection.usersTableDelete(username=processedData["username"])
+    processedData = requestUtils.processRequestData(data=data, origin="delete_user")
+    # Deletes data from Users table in auth db
+    response_status_code, response_data, response_msg = auth.authVerification.authConnection.usersTableUpdate(data=processedData)
+    # Sets response data
+    response_data = requestUtils.processResponse(requestType="update_user",
+                                                 requestData=processedData,
+                                                 responseCode=response_status_code,
+                                                 responseMsg=response_msg,
+                                                 responseData=None)
     # Sets response data mimetype
     response_mimetype = "application/json"
-    # Sets response HTTP status code
-    response_status_code = 201
     # Creates response object
-    response = Response(status=response_status_code,
+    response = Response(response=response_data,
+                        status=response_status_code,
                         mimetype=response_mimetype)
     # Returns response object
     return response

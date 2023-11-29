@@ -5,6 +5,7 @@ from uuid import uuid4
 from sqlalchemy import create_engine, select, update, delete
 from sqlalchemy.orm import Session
 from werkzeug.security import generate_password_hash
+from pydantic import ValidationError
 
 from models.db.authModels import Role, RoleCheck, User, UserCheck, UserUpdate, UserDelete, Base
 from utils.miscUtils import MiscUtils
@@ -49,9 +50,9 @@ class AuthConnection:
             db_engine = create_engine(rf"sqlite:///{self.cwd}/db/auth.db")
             Base.metadata.create_all(db_engine)
             self.db_session = Session(db_engine)
-            self.usersTableCreate(username="root", password="root", role="root")
-            self.usersTableCreate(username="admin", password="admin", role="admin")
-            self.usersTableCreate(username="basic", password="basic", role="basic")
+            self.usersTableCreate(data={"username":"root", "password":"root", "role":"root"})
+            self.usersTableCreate(data={"username":"admin", "password":"admin", "role":"admin"})
+            self.usersTableCreate(data={"username":"basic", "password":"basic", "role":"basic"})
         except Exception as e:
             print("Attempted to connect to auth database. Encountered an error:",e)
             exit(1)
@@ -88,19 +89,29 @@ class AuthConnection:
             print("Error on auth db role deletion operation.")
             self.resetSession()
 
-    def usersTableCreate(self, username:str, password:str, role:str):
+    def usersTableCreate(self, data: dict[str, Any]):
         try:
-            UserCheck.model_validate({"username": username, "password": password, "role": role})
+            createData = UserCheck(**data).model_dump(mode="JSON")
+            username = createData["username"]
+            password = createData["password"]
+            role = createData["role"]
+        except ValidationError as e:
+            return 400, {}, f"Add credentials operation failed: {e}"
+        except Exception as e:
+            return 500, {}, f"Miscellaneous server error: {e}"
+
+        try:
             new_user = User(id=str(uuid4()),
                             username=username,
                             password=generate_password_hash(password=password, method="pbkdf2:sha256"),
                             role=role)
-            
             self.db_session.add(instance=new_user)
             self.db_session.commit()
         except Exception as e:
-            print("Error on auth user creation.")
             self.resetSession()
+            return 500, {}, f"Miscellaneous server error: {e}"
+        
+        return 201, {}, "Credentials successfully created"
 
     def usersTableRead(self, username:str) -> list[dict[str, Any]]:
         try:
@@ -114,27 +125,44 @@ class AuthConnection:
 
         return results
 
-    def usersTableUpdate(self, username:str, changes:dict[str, Any]) -> None:
+    def usersTableUpdate(self, data: dict[str, Any]) -> tuple[int, dict, str]:
         try:
-            UserUpdate.model_validate({"username":username,"changes":changes})
+            updateData = UserUpdate(**data).model_dump(mode="JSON")
+            username = updateData["username"]
+            changes = updateData["changes"]
+        except ValidationError as e:
+            return 400, {}, f"Update credentials operation failed: {e}"
+        except Exception as e:
+            return 500, {}, f"Miscellaneous server error: {e}"
+
+        try:
             update_statement = update(User).where(User.username == username).values(username=changes['username'],
                                                                                     password=generate_password_hash(password=changes["password"]),
                                                                                     role=changes["role"])
-            print(update_statement)
             self.db_session.execute(update_statement)
             self.db_session.commit()
         except Exception as e:
-            print("Error occured when updating user records in auth db:", e)
-            self.resetSession()        
+            self.resetSession()    
+            return 500, {}, f"Miscellaneous server error: {e}"
 
-    def usersTableDelete(self, username:str):
+        return 201, {}, "Credentials successfully updated."    
+
+    def usersTableDelete(self, data: dict[str, Any]) -> tuple[int, dict, str]:
         try:
-            UserDelete.model_validate({"username":username})
+            deleteData = UserDelete(**data).model_dump(mode="JSON")
+            username = deleteData["username"]
+        except ValidationError as e:
+            return 400, {}, f"Delete credentials operation failed: {e}"
+        except Exception as e:
+            return 500, {}, f"Miscellaneous server error: {e}"
+
+        try:
             delete_statement = delete(User).where(User.username == username)
-            print(delete_statement)
             self.db_session.execute(delete_statement)
             self.db_session.commit()
         except Exception as e:
-            print("Error occured when deleting user records in auth db:", e)
             self.resetSession()   
+            return 500, {}, f"Miscellaneous server error: {e}"
+        
+        return 200, {}, "Credentials successfully deleted"
 
