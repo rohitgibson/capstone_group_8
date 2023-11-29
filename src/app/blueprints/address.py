@@ -20,9 +20,10 @@ async def addAddress():
     auth.authUser(permitted_roles=permitted_roles,
                   auth_data=rf"{request.authorization}")
     # Loads data from request
-    data:bytes = await request.get_data()
+    data_nonjson:bytes = await request.get_data()
+    data_json:bytes = await request.get_json()
     # Converts data to Python dictionary
-    processedData = requestUtils.processRequestData(data=data, origin="add")
+    processedData = requestUtils.processRequestData(data_nonjson=data_nonjson, data_json=data_json, origin="add_address")
     # Adds data to Redis db
     addRecordResponseCode, addRecordResponseMsg = redisConnector.addRecord(data=processedData)
     # Sets response data
@@ -51,9 +52,10 @@ async def searchAddress():
     auth.authUser(permitted_roles=permitted_roles,
                   auth_data=rf"{request.authorization}")
     # Loads data from request
-    data:bytes = await request.get_data()
-    # Loads data from request
-    processedData = requestUtils.processRequestData(data=data, origin="search_address")
+    data_nonjson:bytes = await request.get_data()
+    data_json:bytes = await request.get_json()
+    # Converts data to Python dictionary
+    processedData = requestUtils.processRequestData(data_nonjson=data_nonjson, data_json=data_json, origin="search_address")
     # Sends search query to Redis
     searchDataResponseCode, searchDataResponseData, searchRequestMsg = redisConnector.searchData(data=processedData)
     # Sets response data
@@ -82,9 +84,10 @@ async def updateAddress():
     auth.authUser(permitted_roles=permitted_roles,
                   auth_data=rf"{request.authorization}")
     # Loads data from request
-    data:bytes = await request.get_data()
-    # Loads data from request
-    processedData = requestUtils.processRequestData(data=data, origin="update_address")
+    data_nonjson:bytes = await request.get_data()
+    data_json:bytes = await request.get_json()
+    # Converts data to Python dictionary
+    processedData = requestUtils.processRequestData(data_nonjson=data_nonjson, data_json=data_json, origin="update_address")
     # Updates data in Redis
     updateRecordResponseCode, updateRecordResponseMsg = redisConnector.updateRecord(data=processedData)
     # Sets response data
@@ -113,9 +116,10 @@ async def deleteAddress():
     auth.authUser(permitted_roles=permitted_roles,
                   auth_data=rf"{request.authorization}")
     # Loads data from request
-    data:bytes = await request.get_data()
-    # Loads data from request
-    processedData = requestUtils.processRequestData(data=data, origin="delete_address")
+    data_nonjson:bytes = await request.get_data()
+    data_json:bytes = await request.get_json()
+    # Converts data to Python dictionary
+    processedData = requestUtils.processRequestData(data_nonjson=data_nonjson, data_json=data_json, origin="delete_address")
     # Deletes data in Redis
     deleteRecordResponseCode, deleteRecordResponseMsg = redisConnector.deleteRecord(data=processedData)
     # Sets response data

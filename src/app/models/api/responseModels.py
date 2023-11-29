@@ -21,14 +21,7 @@ class RequestTypes(str, Enum):
 
 class RequestResponse(BaseModel):
     requestType: RequestTypes
-    requestData: Union[AddAddress, 
-                       UpdateAddress, 
-                       DeleteAddress, 
-                       SearchAddress, 
-                       UserCheck,
-                       UserUpdate,
-                       UserDelete,
-                       dict]
+    requestData: dict
     requestSuccess: bool
     responseTimestamp: datetime
     responseStatusMsg: str

@@ -16,7 +16,7 @@ class RequestUtils:
         """Initializes a new RequestUtils instance."""
         pass
     
-    def processRequestData(self, data: bytes, origin: str) -> dict[str, Any]:
+    def processRequestData(self, data_nonjson: bytes, data_json: bytes, origin: str) -> dict[str, Any]:
         """
         Inbound requests for all endpoints error if data
         is either not present or in the wrong format. This
@@ -39,12 +39,16 @@ class RequestUtils:
 
         # Attempts to convert data from JSON object to Python dict.
         try:
-            processedData = json.loads(data)
+            processedData = dict(json.loads(data_nonjson))
         except Exception as e:
             # If error encountered in JSON conversion process, return
             # empty dict to prevent errors in request logic.
             # logging.error("Exception in Request data:", e)
-            processedData = {}
+            try:
+                processedData = dict(json.loads(data_json))
+            except Exception as e:
+                processedData = {}
+
 
         # Returns dict of processed inbound request data.
         return processedData

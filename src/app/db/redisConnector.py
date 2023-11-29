@@ -107,13 +107,13 @@ class RedisConnector(RedisRestore):
 
         # Validate the address data using the AddAddress model.
         try:
-            newAddress = AddAddress(**data).model_dump()["address"]
+            newAddress = AddAddress(**data).model_dump(mode="JSON")["address"]
         except ValidationError as e:
             # Return a 400 status code and an error message if the address data is invalid.
             return 400, f"Address validation failed: {e}"
         except Exception as e:
             # Return a 500 status code and an error message if an unexpected error occurs.
-            return 500, f"Miscellaneous server error: {e}. Please try again later."
+            return 500, f"ADD ADDRESS - Model Validation: Miscellaneous server error: {e}. Please try again later."
         
         # Set the address record in Redis using the json().set() command.
         try:
@@ -122,10 +122,10 @@ class RedisConnector(RedisRestore):
                                  obj=newAddress)    
         except ConnectionError as e:
             # Return a 500 status code and an error message if a database connection error occurs.
-            return 500, f"Database connection error: {e}. Please try again later."
+            return 500, f"ADD ADDRESS - Adding key: Database connection error: {e}. Please try again later."
         except Exception as e:
             # Return a 500 status code and an error message if an unexpected error occurs.
-            return 500, f"Miscellaneous server error: {e}. Please try again later."
+            return 500, f"ADD ADDRESS - Adding key: Miscellaneous server error: {e}. Please try again later."
 
         # Return a 201 status code and a success message if the address record was successfully added to Redis.
         return 201, "Address successfully added to Redis"

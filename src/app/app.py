@@ -1,5 +1,4 @@
 from quart import Quart
-from datetime import datetime as dt
 
 from blueprints.address import address_blueprint
 from blueprints.users import user_blueprint

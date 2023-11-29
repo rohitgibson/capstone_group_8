@@ -17,9 +17,10 @@ async def addUsers():
     auth.authUser(permitted_roles=permitted_roles,
                   auth_data=rf"{request.authorization}")
     # Loads data from request
-    data:bytes = await request.get_data()
+    data_nonjson:bytes = await request.get_data()
+    data_json:bytes = await request.get_json()
     # Converts data to Python dictionary
-    processedData = requestUtils.processRequestData(data=data, origin="add_user")
+    processedData = requestUtils.processRequestData(data_nonjson=data_nonjson, data_json=data_json, origin="add_user")
     # Adds data to Users table in auth db
     response_status_code, response_data, response_msg = auth.authVerification.authConnection.usersTableCreate(data=processedData)
     # Sets response data
@@ -46,9 +47,10 @@ async def updateUsers():
     auth.authUser(permitted_roles=permitted_roles,
                   auth_data=rf"{request.authorization}")
     # Loads data from request
-    data:bytes = await request.get_data()
+    data_nonjson:bytes = await request.get_data()
+    data_json:bytes = await request.get_json()
     # Converts data to Python dictionary
-    processedData = requestUtils.processRequestData(data=data, origin="update_user")
+    processedData = requestUtils.processRequestData(data_nonjson=data_nonjson, data_json=data_json, origin="update_user")
     # Updates data in Users table in auth db
     response_status_code, response_data, response_msg = auth.authVerification.authConnection.usersTableUpdate(data=processedData)
     # Sets response data
@@ -73,13 +75,14 @@ async def deleteUsers():
     auth.authUser(permitted_roles=permitted_roles,
                   auth_data=rf"{request.authorization}")
     # Loads data from request
-    data:bytes = await request.get_data()
+    data_nonjson:bytes = await request.get_data()
+    data_json:bytes = await request.get_json()
     # Converts data to Python dictionary
-    processedData = requestUtils.processRequestData(data=data, origin="delete_user")
+    processedData = requestUtils.processRequestData(data_nonjson=data_nonjson, data_json=data_json, origin="delete_address")
     # Deletes data from Users table in auth db
     response_status_code, response_data, response_msg = auth.authVerification.authConnection.usersTableUpdate(data=processedData)
     # Sets response data
-    response_data = requestUtils.processResponse(requestType="update_user",
+    response_data = requestUtils.processResponse(requestType="delete_user",
                                                  requestData=processedData,
                                                  responseCode=response_status_code,
                                                  responseMsg=response_msg,
