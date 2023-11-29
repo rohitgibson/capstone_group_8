@@ -59,8 +59,7 @@ Follow the guides at [https://docs.docker.com/get-docker/](https://docs.docker.c
 Enter the following command into a MacOS, Linux, or Windows Subsystem for Linux (WSL) terminal This downloads our Docker Compose file from GitHub as compose.yaml:
 
 ```
-curl https://raw.githubusercontent.com/rohitgibson/capstone_group_8/main/compose.yaml -o 
-compose.yaml
+curl https://raw.githubusercontent.com/rohitgibson/capstone_group_8/main/compose.yaml -o compose.yaml
 ```
 
 #### Install and Run API and Dependencies
