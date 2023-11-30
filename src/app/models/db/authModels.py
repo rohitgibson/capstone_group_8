@@ -9,21 +9,13 @@ from pydantic import BaseModel, Field
 class Base(DeclarativeBase):
     pass
 
-class Role(Base):
-    __tablename__ = "roles"
-
-    name: Mapped[str] = mapped_column(String(20), primary_key=True)
-
-class RoleCheck(BaseModel):
-    name: str = Field(max_length=20)
-
 class User(Base):
     __tablename__ = "users"
 
     id: Mapped[str] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(String(128), index=True, nullable=False, unique=True)
-    password: Mapped[BLOB] = mapped_column(String(256), index=False, nullable=False, unique=True)
-    role: Mapped[str] = mapped_column(ForeignKey("roles.name"))
+    password: Mapped[BLOB] = mapped_column(String(256), index=False, nullable=False, unique=False)
+    role: Mapped[str] = mapped_column(String(128), index=False, nullable=False, unique=False)
 
 class UserCheck(BaseModel):
     username: str = Field(max_length=128)

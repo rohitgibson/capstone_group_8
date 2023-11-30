@@ -43,6 +43,7 @@ class HTTPBasicAuth():
 
             # If auth_data can't be parsed, raise an abort signal
             else:
+                role = ""
                 abort(403)
 
             # Check if the user's role is in the permitted_roles list

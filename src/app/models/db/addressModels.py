@@ -1,6 +1,7 @@
 from typing import Optional, Union, Any
 from re import fullmatch
 
+
 # from redis_om import HashModel, VectorFieldOptions, Field
 from pydantic import BaseModel, ValidationError, model_validator, field_validator, constr, Field, InstanceOf, ConfigDict
 

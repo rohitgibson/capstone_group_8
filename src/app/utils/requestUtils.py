@@ -1,10 +1,11 @@
-from typing import Union, Any
+from typing import Union, Any, Literal
 from datetime import datetime as dt
+import os
 
 import simplejson as json
 from pydantic import ValidationError
 
-from models.api.responseModels import RequestResponse
+from models.api.responseModels import RequestResponse, AbortResponse
 
 class RequestUtils:
     """
@@ -101,18 +102,93 @@ class RequestUtils:
             responseData = responseData
 
         # builds requestResponse data from previously set variables
-        requestResponse = {
-            "requestType": requestType,
-            "requestData": requestData,
-            "requestSuccess": requestSuccess,
-            "responseTimestamp": dt.utcnow(),
-            "responseStatusMsg": responseMsg,
-            "responseData": responseData
-        }
+        if eval(str(self.getCurrentFlags(flag="verbose"))) is True:
+            # if the verbose flag is True return the response message
+            # in its entirety
+            requestResponse = {
+                "requestType": requestType,
+                "requestData": requestData,
+                "requestSuccess": requestSuccess,
+                "responseTimestamp": dt.utcnow(),
+                "responseStatusMsg": responseMsg,
+                "responseData": responseData
+            }
+        else:
+            requestResponse = {
+                "requestType": requestType,
+                "requestData": requestData,
+                "requestSuccess": requestSuccess,
+                "responseTimestamp": dt.utcnow(),
+                "responseStatusMsg": responseMsg.split(":")[0],
+                "responseData": responseData
+            }
 
-        # converts addResponse dict data to JSON for API response
+        # converts requestResponse dict data to JSON for API response
         requestResponse = RequestResponse(**requestResponse).model_dump_json()
 
-        # returns addResponse JSON data
+        # returns requestResponse JSON data
         return requestResponse
     
+    def processAbortResponse(self, responseCode:int, responseMsg:str):
+        """
+        Constructs an abort response dictionary, converts it to JSON 
+        format, and returns the JSON-formatted string.
+
+        Args:
+            `responseCode`: 
+                The response code for the abort response.
+            `responseMsg`: 
+                The response message for the abort response.
+
+        Returns:
+            The JSON-formatted abort response string.
+        """
+
+        # builds abortResponse dict from params
+        abortResponse = {
+            "responseStatusCode": int(responseCode),
+            "responseStatusMsg": responseMsg
+        }
+
+        # converts abortResponse dict data to JSON for API response
+        abortResponse = AbortResponse(**abortResponse).model_dump_json()
+
+        # returns abortResponse data
+        return abortResponse
+    
+    def getCurrentFlags(self, flag:Union[Literal["verbose"], Literal["validation"], Literal["redis-lock"]]):
+        """
+        Retrieves the current value of the specified AVS response flag.
+
+        Args:
+            `mode`: 
+                The flag to retrieve.
+
+        Returns:
+            A boolean representing the current value of the specified flag.
+        """
+
+        if flag == "verbose":
+            return os.environ.get("AVS_RESPONSE_VERBOSE", "False")
+        elif flag == "validation":
+            return os.environ.get("AVS_RESPONSE_VALIDATION", "True")
+        elif flag == "redis-lock":
+            return os.environ.get("AVS_REDIS_LOCK", "False")
+
+    def setCurrentFlags(self, flag:Union[Literal["verbose"], Literal["validation"], Literal["redis-lock"]], flag_value:str):
+        """
+        Sets the specified AVS response flag to the given value.
+
+        Args:
+            `mode`: 
+                The flag to set.
+            `flag_value`: 
+                The new value for the specified flag.
+        """
+
+        if flag == "verbose":
+            os.environ["AVS_RESPONSE_VERBOSE"] = flag_value
+        elif flag == "validation":
+            os.environ["AVS_RESPONSE_VALIDATION"] = flag_value
+        elif flag == "redis-lock":
+            os.environ["AVS_REDIS_LOCK"] == flag_value

@@ -11,9 +11,9 @@ from utils.makeFuzzy import MakeFuzzy
 
 from models.api.modifyModels import AddAddress, DeleteAddress, UpdateAddress
 from models.api.searchModels import SearchAddress, SearchResults
-from db.redisRestore import RedisRestore
+from utils.requestUtils import RequestUtils
 
-class RedisConnector(RedisRestore):
+class RedisConnector:
     """
     Handles all interactions with RedisDB from defining connection parameters
     to the Add, Validate/Search, Update, and Delete address use cases.    
@@ -21,7 +21,7 @@ class RedisConnector(RedisRestore):
 
     def __init__(self):        
         # Establishes Redis connection for all subsequent requests
-        self.conn = Redis(host="localhost", port="6379", decode_responses=True)
+        self.conn = Redis(host="redis", port="6379", decode_responses=True)
 
         # Attempts to create a search index
         self.createIndex()
@@ -113,7 +113,7 @@ class RedisConnector(RedisRestore):
             return 400, f"Address validation failed: {e}"
         except Exception as e:
             # Return a 500 status code and an error message if an unexpected error occurs.
-            return 500, f"ADD ADDRESS - Model Validation: Miscellaneous server error: {e}. Please try again later."
+            return 500, f"Miscellaneous server error: {e}. Please try again later."
         
         # Set the address record in Redis using the json().set() command.
         try:
@@ -122,10 +122,13 @@ class RedisConnector(RedisRestore):
                                  obj=newAddress)    
         except ConnectionError as e:
             # Return a 500 status code and an error message if a database connection error occurs.
-            return 500, f"ADD ADDRESS - Adding key: Database connection error: {e}. Please try again later."
+            return 500, f"Database connection error: {e}. Please try again later."
         except Exception as e:
             # Return a 500 status code and an error message if an unexpected error occurs.
-            return 500, f"ADD ADDRESS - Adding key: Miscellaneous server error: {e}. Please try again later."
+            return 500, f"Miscellaneous server error: {e}. Please try again later."
+        
+        # Reindex for search if address successfully added
+        self.createIndex()
 
         # Return a 201 status code and a success message if the address record was successfully added to Redis.
         return 201, "Address successfully added to Redis"
@@ -242,6 +245,8 @@ class RedisConnector(RedisRestore):
         # Convert the search results to a list of dictionaries.
         searchResults = [{'key':result["id"],"address":json.loads(result["json"])} for result in searchResults]
 
+        print(searchResults)
+
         # Check if the search results are empty.
         if searchResults != []:
             # The address is verified if there are search results.
@@ -265,7 +270,7 @@ class RedisConnector(RedisRestore):
             }
 
         # Convert the search data response dictionary to a JSON object.
-        searchDataResponseData = SearchResults(**searchDataResponseData).model_dump()
+        searchDataResponseData = SearchResults(**searchDataResponseData).model_dump(mode="JSON")
 
         # Return the search results and verification status.
         return 200, searchDataResponseData, "Address search/verification successful"
@@ -294,7 +299,7 @@ class RedisConnector(RedisRestore):
         key = updateAddress["key"]
         key_exists:bool = self.checkKeyExists(key=key)
         if key_exists is False:
-            return 404, f"Key {key} does not exist."
+            return 404, f"Key does not exist."
         else:
             pass
 
@@ -334,7 +339,7 @@ class RedisConnector(RedisRestore):
         key = deleteAddress["key"]
         key_exists:bool = self.checkKeyExists(key=key)
         if key_exists is False:
-            return 404, f"Key {key} does not exist."
+            return 404, f"Key does not exist."
         else:
             pass
 

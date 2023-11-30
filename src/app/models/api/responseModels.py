@@ -18,7 +18,6 @@ class RequestTypes(str, Enum):
     delete_user = "delete_user"
     demo_resetdb = "demo_resetdb"
 
-
 class RequestResponse(BaseModel):
     requestType: RequestTypes
     requestData: dict
@@ -27,6 +26,8 @@ class RequestResponse(BaseModel):
     responseStatusMsg: str
     responseData: Union[SearchResults, dict]
 
-
+class AbortResponse(BaseModel):
+    responseStatusCode: int
+    responseStatusMsg: str
 
 

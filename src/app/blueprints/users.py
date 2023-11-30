@@ -10,7 +10,7 @@ auth = HTTPBasicAuth()
 requestUtils = RequestUtils()
 
 # ENDPOINT -- ADD AUTH USER
-@user_blueprint.route("/api/users/add", methods=["POST"])
+@user_blueprint.route("/api/users/create", methods=["POST"])
 async def addUsers():
     permitted_roles = ["root"]
     # Loads request auth headers
@@ -80,7 +80,7 @@ async def deleteUsers():
     # Converts data to Python dictionary
     processedData = requestUtils.processRequestData(data_nonjson=data_nonjson, data_json=data_json, origin="delete_address")
     # Deletes data from Users table in auth db
-    response_status_code, response_data, response_msg = auth.authVerification.authConnection.usersTableUpdate(data=processedData)
+    response_status_code, response_data, response_msg = auth.authVerification.authConnection.usersTableDelete(data=processedData)
     # Sets response data
     response_data = requestUtils.processResponse(requestType="delete_user",
                                                  requestData=processedData,

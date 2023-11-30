@@ -37,4 +37,3 @@ class DeleteAddress(BaseModel):
             return v
         else:
             raise ValueError("Key in incorrect format. Must begin with 'address.'")
-        

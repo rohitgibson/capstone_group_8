@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from werkzeug.security import generate_password_hash
 from pydantic import ValidationError
 
-from models.db.authModels import Role, RoleCheck, User, UserCheck, UserUpdate, UserDelete, Base
+from models.db.authModels import User, UserCheck, UserUpdate, UserDelete, Base
 from utils.miscUtils import MiscUtils
 
 class AuthConnection:
@@ -66,30 +66,7 @@ class AuthConnection:
         except Exception as e:
             print("Exception on auth db session reset:", e)
 
-    
-    def rolesTableCreate(self, name:str):
-        try:
-            RoleCheck.model_validate({"name": name})
-            new_role = Role(name=name)
-
-            self.db_session.add(instance=new_role)
-            self.db_session.commit()
-        except Exception as e:
-            print("Error on auth db role creation operation.")
-            self.resetSession()
-
-    def rolesTableDelete(self, name:str):
-        try:
-            RoleCheck.model_validate({"name": name})
-            delete_statement = delete(Role).where(Role.name == name)
-
-            self.db_session.execute(delete_statement)
-            self.db_session.commit()
-        except Exception as e:
-            print("Error on auth db role deletion operation.")
-            self.resetSession()
-
-    def usersTableCreate(self, data: dict[str, Any]):
+    def usersTableCreate(self, data: dict[str, Any]) -> tuple[int, dict[str, Any], str]:
         try:
             createData = UserCheck(**data).model_dump(mode="JSON")
             username = createData["username"]
@@ -117,7 +94,7 @@ class AuthConnection:
         try:
             UserCheck.model_validate({"username": username, "password": "password", "role": "role"})
             read_statement = select(User).where(User.username == username)
-            results = [{"username":user.username, "password":user.password, "role":user.role} for user in self.db_session.scalars(read_statement).all()]
+            results = [{"id":user.id, "username":user.username, "password":user.password, "role":user.role} for user in self.db_session.scalars(read_statement).all()]
         except Exception as e:
             print("Error occured while trying to read auth users:", e)
             self.resetSession()
@@ -136,9 +113,10 @@ class AuthConnection:
             return 500, {}, f"Miscellaneous server error: {e}"
 
         try:
-            update_statement = update(User).where(User.username == username).values(username=changes['username'],
-                                                                                    password=generate_password_hash(password=changes["password"]),
-                                                                                    role=changes["role"])
+            prev_user = self.usersTableRead(username=username)[0]["id"]
+            update_statement = update(User).where(User.id == prev_user).values(username=changes['username'],
+                                                                               password=(generate_password_hash(password=changes["password"], method="pbkdf2:sha256")),
+                                                                               role=changes["role"])
             self.db_session.execute(update_statement)
             self.db_session.commit()
         except Exception as e:
@@ -157,7 +135,8 @@ class AuthConnection:
             return 500, {}, f"Miscellaneous server error: {e}"
 
         try:
-            delete_statement = delete(User).where(User.username == username)
+            prev_user = self.usersTableRead(username=username)[0]["id"]
+            delete_statement = delete(User).where(User.id == prev_user)
             self.db_session.execute(delete_statement)
             self.db_session.commit()
         except Exception as e:
