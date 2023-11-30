@@ -1,7 +1,8 @@
 # AVS User Manual - Group 8
 
 Capstone Group 8 (on GitHub): [https://github.com/rohitgibson/capstone_group_8](https://github.com/rohitgibson/capstone_group_8) 
-Documentation: https://kennesawedu.sharepoint.com/:w:/s/Team-ISCapstone981/ESzbJcj0zDlPneQuHJ0YPIoBWcDXlSvJuSVgsMp-X7abzA?email=rgibso50%40students.kennesaw.edu&e=sP1Bkd
+
+Documentation: [Microsoft Sharepoint Link](https://kennesawedu.sharepoint.com/:w:/s/Team-ISCapstone981/ESzbJcj0zDlPneQuHJ0YPIoBWcDXlSvJuSVgsMp-X7abzA?email=rgibso50%40students.kennesaw.edu&e=sP1Bkd)
 
 ## Table of Contents
 
