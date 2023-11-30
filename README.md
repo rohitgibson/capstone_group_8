@@ -2,7 +2,7 @@
 
 Capstone Group 8 (on GitHub): [https://github.com/rohitgibson/capstone_group_8](https://github.com/rohitgibson/capstone_group_8) 
 
-Documentation: [Microsoft Sharepoint Link]()
+Documentation: [Microsoft Sharepoint Link](https://kennesawedu.sharepoint.com/:w:/s/Team-ISCapstone981/ESzbJcj0zDlPneQuHJ0YPIoBX3a6aiqz5Fx4kxImzUUJBg?e=XnVchr)
 
 ## Table of Contents
 
