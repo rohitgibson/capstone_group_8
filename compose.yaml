@@ -3,7 +3,7 @@ name: group_8_capstone
 services:
   server:
     container_name: "group_8_avs_api"
-    # image: "ghcr.io/rohitgibson/capstone_group_8:main"
+    image: "ghcr.io/rohitgibson/capstone_group_8:main"
     build: 
       context: .
     ports:
